@@ -36,6 +36,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "lint": "tslint ./src/**/*.ts ./test/**/*.ts ./examples/typescript/src/*.ts",
+    "build": "echo 'fake build'",
     "format": "tsfmt -r"
   },
   "repository": {
