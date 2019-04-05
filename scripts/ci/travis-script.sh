@@ -26,13 +26,15 @@ else
 fi
 
 # Check if tests can be skipped
-if [[ ${fileDiff} =~ ^(.*\.md\s*)*$ ]]; then
-  echo "Skipping tests since only markdown files changed."
-  exit 0
-fi
+# if [[ ${fileDiff} =~ ^(.*\.md\s*)*$ ]]; then
+#  echo "Skipping tests since only markdown files changed."
+#  exit 0
+# fi
 
 if [ "${MODE}" = "lint" ]; then
   npm run lint
+elif [ "${MODE}" = "audit" ]; then
+  npm audit
 fi
 
 # Upload coverage results if those are present.

@@ -3,7 +3,7 @@ sudo: required
 dist: trusty
 
 node_js:
-- '8.9.4'
+- '10.15.3'
 branches:
   only:
     - master
@@ -11,6 +11,7 @@ branches:
 jobs:
   include:
     - env: "MODE=lint"
+    - env: "MODE=audit"
 install:
 - npm install
 script:
