@@ -1,24 +1,6 @@
 language: node_js
 sudo: required
 dist: trusty
-
-node_js:
-- '10.15.3'
-branches:
-  only:
-    - master
-    - develop
-jobs:
-  include:
-    - env: "MODE=lint"
-    - env: "MODE=audit"
-install:
-- npm install
-script:
-- ./scripts/ci/travis-script.sh
-cache:
-  directories:
-    - ./node_modules/
 env:
   global:
    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
@@ -37,3 +19,20 @@ addons:
     build_command_prepend: ""
     build_command: "npm run build"
     branch_pattern: coverity_scan
+node_js:
+- '10.15.3'
+branches:
+  only:
+    - master
+    - develop
+jobs:
+  include:
+    - env: "MODE=lint"
+    - env: "MODE=audit"
+install:
+- npm install
+script:
+- ./scripts/ci/travis-script.sh
+cache:
+  directories:
+    - ./node_modules/
