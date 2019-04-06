@@ -12,11 +12,11 @@ addons:
   coverity_scan:
     project:
       name: "Teradata/nodejs-driver"
-      description: "<Your project description here>"
+      description: "Teradata Node.js Driver"
     notification_email: jeremy.smartt@teradata.com
     build_command_prepend: ""
     build_command: "npm run build"
-    branch_pattern: coverity_scan
+    branch_pattern: develop
 node_js:
 - '10.15.3'
 branches:

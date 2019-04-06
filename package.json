@@ -36,7 +36,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "lint": "tslint ./src/**/*.ts ./test/**/*.ts ./examples/typescript/src/*.ts",
-    "build": "echo 'fake build'",
+    "build": "npm run clean && tsc",
     "format": "tsfmt -r"
   },
   "repository": {
