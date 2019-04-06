@@ -1,22 +1,7 @@
 language: node_js
 sudo: required
 dist: trusty
-env:
-  global:
-   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
-   #   via the "travis encrypt" command using the project repo's public key
-   - secure: "mSYYSXLklp1jRgcDobF0VsWZt2ZVlst8EsQy8yAJzN/9QRfku7pAx9kI1tdQ40rPW6be1jwASu08/ouSW06z03hBoNictobjyD+0ndeM09YicYLKI5+5zHspI8N3IxZdD2uu2LJ2+X0cZTSMCLi5ZyVIlCRQrCcQtbgkiD2nPGGzjIDl4CmlrQgLbxmFk+JRGqElIkdcKyOf0j2imrWKqe2F0FJX78np1rWHlAbmCE4/NdwWo6ekb7uv6ABhWdky/gQ/h4DoDDiZF3PI2dApwSLH9p1eUPGtgRp3jscvtJL0YlWKGKlkGGfcOsAdds0IxsJt7SLdbIBl8TJdh4ToJl3LT0Yd/pzUGm17+6TcxAKbCVQOK+mphS1E21bPguL0BiqMIJ+8z5JSOAasq0vNkHhAfN9qck2D46QtKTgQR7d6EilF9urLb9JJRRCnjqmdAjOfdGxUgnxYvmobFcRBc6s1bmio1ags/Dy2VwniRHFgpAoqKiRFcSkMPTWRKSzr/uJ2GfbKerHas8XvnyrJsZGxbmRyomAo2+2yjXGbVMWZ/pAUXJPL6ZN/WIyP4bteto1NMtN3e/KdoiBpxSj0C+a90jkRuKSBksD8ckqNDjqxaOo5R8tXSqKkfE5aFMcI/5IgZixvHXnAFAUuzrQUtGKXSS0OOsT8lF8DjYjG2kI="
-before_install:
-  - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
-addons:
-  coverity_scan:
-    project:
-      name: "Teradata/nodejs-driver"
-      description: "Teradata Node.js Driver"
-    notification_email: jeremy.smartt@teradata.com
-    build_command_prepend: ""
-    build_command: "npm run build"
-    branch_pattern: develop
+
 node_js:
 - '10.15.3'
 branches:
@@ -25,13 +10,12 @@ branches:
     - develop
 jobs:
   include:
-    - env: "MODE=coverity"
     - env: "MODE=lint"
     - env: "MODE=audit"
 install:
 - npm install
 script:
-- if [ ${COVERITY_SCAN_BRANCH} != 1 ]; then ./scripts/ci/travis-script.sh ; fi
+- ./scripts/ci/travis-script.sh
 cache:
   directories:
     - ./node_modules/
