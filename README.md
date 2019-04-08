@@ -1,9 +1,76 @@
-# nodejs-driver
-Node.js Teradata Driver
+## Node.js Driver for Teradata
 
 <a href="https://scan.coverity.com/projects/teradata-nodejs-driver">
-  <img alt="Coverity Scan Build Status"
-       src="https://scan.coverity.com/projects/18123/badge.svg"/>
+  <img alt="Coverity Scan Build Status" src="https://scan.coverity.com/projects/18123/badge.svg"/>
 </a>
 
-(coming soon)
+<p>
+    <img src="docs/assets/teradata-dark.svg" alt="Teradata Logo" width="170">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <img
+      alt="Node.js"
+      src="https://nodejs.org/static/images/logo-light.svg"
+      width="100"
+    />
+</p>
+
+The Teradata nodejs-driver module is a Database API Specification v2.0 compliant driver for Node.js and the Teradata Database.
+
+Teradata nodejs-driver is open source and maintained by Teradata. It is currently in Beta but has a comprehensive test suite for the supported features.
+
+Database API Specification v2.0: https://www.python.org/dev/peps/pep-0249/
+
+---
+
+## Supported Platforms
+
+Node.js:
+
+* 8.x, 9.x, 10.x, 11.x
+
+Operating Systems:
+
+* Apple macOS, Microsoft Windows, Linux
+
+---
+
+## Architecture
+<img alt="Node Teradata Architecture" src="docs/assets/NodeJsDiagram.png" height="261">
+
+---
+
+## Useful Information
+
+* [Setup and Running](docs/SETUPRUNNING.md)
+* [Connection Parameters](docs/CONNECTIONPARAMS.md)
+* [Stored Password Protection](docs/STOREDPASSWORD.md)
+* [Data Types](docs/DATATYPES.md)
+* [Module Exceptions](docs/MODULEEXCEPTIONS.md)
+* [Examples](examples/README.md)
+
+---
+
+## License
+
+The MIT License
+
+Copyright (c) 2019 by Teradata. All rights reserved. http://teradata.com
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+---

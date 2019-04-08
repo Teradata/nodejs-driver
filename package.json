@@ -34,10 +34,17 @@
     "typescript-formatter": "^7.2.2"
   },
   "scripts": {
+    "test": "rimraf src/node_modules && gulp copy-native-lib-for-test && npm run build && mocha -r ts-node/register test/**/*.ts",
     "clean": "rimraf dist",
     "lint": "tslint ./src/**/*.ts ./test/**/*.ts ./examples/typescript/src/*.ts",
-    "build": "npm run clean && tsc",
-    "format": "tsfmt -r"
+    "format": "tsfmt -r",
+    "build": "run-script-os",
+    "build:win32": "npm run clean && tsc",
+    "build:darwin": "npm run clean && tsc",
+    "build:linux": "npm run clean && tsc",
+    "publish": "npm run build && gulp publish-nodejsdriver",
+    "install": "node scripts/install-dependencies.js",
+    "i": "node scripts/install-dependencies.js"
   },
   "repository": {
     "type": "git",

@@ -1,0 +1,8 @@
+{
+  "name": "examples-javascript",
+  "description": "node.js teradata driver example using javascript",
+  "version": "1.0.0-beta.1",
+  "dependencies": {
+    "teradata-nodejsdriver": "1.0.0-beta.1"
+  }
+}
