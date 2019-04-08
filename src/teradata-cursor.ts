@@ -483,7 +483,6 @@ export class TeradataCursor {
       return this.deserializeNull(pc, i, row);
     } else {
       throw new OperationalError('Expected column type T/F/N.');
-      return 0;
     }
   }
 
@@ -510,7 +509,6 @@ export class TeradataCursor {
       return this.deserializeNull(pc, i, row);
     } else {
       throw new OperationalError('Expected column type B/N.');
-      return 0;
     }
   }
 
@@ -544,7 +542,6 @@ export class TeradataCursor {
       return this.deserializeNull(pc, i, row);
     } else {
       throw new OperationalError('Expected column type ' + String.fromCharCode(abyTypeCode) + '/N.');
-      return 0;
     }
   }
 
@@ -567,7 +564,6 @@ export class TeradataCursor {
       return this.deserializeNull(pc, i, row);
     } else {
       throw new OperationalError('Expected column type D/N.');
-      return 0;
     }
   }
 
@@ -585,7 +581,6 @@ export class TeradataCursor {
       return this.deserializeNull(pc, i, row);
     } else {
       throw new OperationalError('Expected column type I/N.');
-      return 0;
     }
   }
 
@@ -603,7 +598,6 @@ export class TeradataCursor {
       return i + 1;
     } else {
       throw new OperationalError('Expected column type N.');
-      return 0;
     }
   }
 
