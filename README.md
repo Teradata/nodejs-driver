@@ -1,5 +1,7 @@
 ## Node.js Driver for Teradata
 
+[![Build Status](https://travis-ci.org/Teradata/nodejs-driver.svg?branch=develop)](https://travis-ci.org/Teradata/nodejs-driver)
+
 <a href="https://scan.coverity.com/projects/teradata-nodejs-driver">
   <img alt="Coverity Scan Build Status" src="https://scan.coverity.com/projects/18123/badge.svg"/>
 </a>
