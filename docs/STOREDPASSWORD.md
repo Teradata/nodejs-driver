@@ -21,7 +21,7 @@ Stored Password Protection is offered by the Teradata JDBC Driver and the Terada
 ### Test Example
 
 See the following test for example code using Stored Password Protection with the Teradata SQL Driver for Node.js
-* [https://github.td.teradata.com/gosql/nodejsdriver/tree/develop/test/security/encrypted-password.ts](https://github.td.teradata.com/gosql/nodejsdriver/tree/develop/test/security/encrypted-password.ts)
+* [https://github.com/Teradata/nodejs-driver/blob/develop/test/security/encrypted-password.ts](https://github.com/Teradata/nodejs-driver/blob/develop/test/security/encrypted-password.ts)
 
 ### Password Encryption Key File Format
 
