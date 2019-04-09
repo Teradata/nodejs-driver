@@ -52,7 +52,7 @@ export class TeradataConnection {
   private byteArray: any;
   private logLevel: number;
   private logger: TeradataLogging;
-  private sVersionNumber: string = '16.20.0.41'; // Version Number
+  private sVersionNumber: string = '425ed53096b71d851d115e4dfcc12562f53c968a'; // Version Number
 
   constructor() {
     this.poolHandle = null;
