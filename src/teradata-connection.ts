@@ -7,16 +7,16 @@ let abiVersion: string = process.versions.modules;
 
 if (process.platform === 'win32') {
   /* tslint:disable-next-line */
-  fastcall = require('teradata-prebuilt-fastcall-win32-' + platform + '-v' + abiVersion);
+  fastcall = require('@teradataprebuilt/fastcall-win32-' + platform + '-v' + abiVersion);
 } else if (process.platform === 'darwin') {
   /* tslint:disable-next-line */
-  fastcall = require('teradata-prebuilt-fastcall-darwin-' + platform + '-v' + abiVersion);
+  fastcall = require('@teradataprebuilt/fastcall-darwin-' + platform + '-v' + abiVersion);
 } else if (process.platform === 'freebsd') {
   /* tslint:disable-next-line */
-  fastcall = require('teradata-prebuilt-fastcall-freebsd-' + platform + '-v' + abiVersion);
+  fastcall = require('@teradataprebuilt/fastcall-freebsd-' + platform + '-v' + abiVersion);
 } else if (process.platform === 'linux') {
   /* tslint:disable-next-line */
-  fastcall = require('teradata-prebuilt-fastcall-linux-' + platform + '-v' + abiVersion);
+  fastcall = require('@teradataprebuilt/fastcall-linux-' + platform + '-v' + abiVersion);
 }
 
 import { TeradataCursor } from './teradata-cursor';
@@ -72,11 +72,11 @@ export class TeradataConnection {
     // Setup libpath for fastcall.library
     let libpath: string = '';
     if (process.platform === 'win32') {
-      libpath = __dirname + '/node_modules/teradata-nativelib-win32/teradatasql.dll';
+      libpath = __dirname + '/node_modules/@teradataprebuilt/nativelib-win32/teradatasql.dll';
     } else if (process.platform === 'darwin') {
-      libpath = __dirname + '/node_modules/teradata-nativelib-darwin/teradatasql.dylib';
+      libpath = __dirname + '/node_modules/@teradataprebuilt/nativelib-darwin/teradatasql.dylib';
     } else if (process.platform === 'freebsd' || process.platform === 'linux') {
-      libpath = __dirname + '/node_modules/teradata-nativelib-linux/teradatasql.so';
+      libpath = __dirname + '/node_modules/@teradataprebuilt/nativelib-linux/teradatasql.so';
     }
 
     // Load native library with libpath and options

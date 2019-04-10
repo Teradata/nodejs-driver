@@ -73,7 +73,7 @@ gulp.task('npm-publish', function (cb) {
         if (err) {
           return console.log(err);
         }
-        var result = data.replace(/teradata-prebuilt-fastcall/g, 'teradata-prebuilt-fastcall-' + os + '-' + platform + '-' + abiNumber);
+        var result = data.replace(/teradata-prebuilt-fastcall/g, '@teradataprebuilt/fastcall-' + os + '-' + platform + '-' + abiNumber);
 
         fs.writeFileSync('package.json', result, 'utf8');
         var cmd = getSpawn('npm', ['publish', '--access=public']);

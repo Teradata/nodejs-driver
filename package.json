@@ -8,7 +8,9 @@
     "test": "test"
   },
   "dependencies": {
-    "run-script-os": "^1.0.3"
+    "run-script-os": "^1.0.3",
+    "teradata-nativelib-darwin": "^1.0.0-beta.1.1",
+    "teradata-prebuilt-fastcall-darwin-node-v57": "^0.2.6-1"
   },
   "devDependencies": {
     "@types/chai": "^4.1.4",
@@ -16,7 +18,7 @@
     "@types/node": "^10.5.7",
     "chai": "^4.1.2",
     "glob": "^6.0.4",
-    "gulp": "^4.0.0",
+    "gulp": "3",
     "gulp-bump": "2.1.0",
     "gulp-help": "1.6.1",
     "gulp-if": "2.0.1",
