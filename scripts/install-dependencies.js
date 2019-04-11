@@ -21,5 +21,5 @@ var os = process.platform;
 var teradataPrebuiltFastcallVersion = '0.2.6';
 var teradataNativelibVersion = '1.0.0-beta.1';
 
-getSpawn('npm', ['install', '@teradataprebuilt/fastcall-' + os + '-' + platform + '-v' + abiVersion + '@' + teradataPrebuiltFastcallVersion]);
-getSpawn('npm', ['install', '@teradataprebuilt/nativelib-' + os + '@' + teradataNativelibVersion]);
+getSpawn('npm', ['install', '--no-save', '@teradataprebuilt/fastcall-' + os + '-' + platform + '-v' + abiVersion + '@' + teradataPrebuiltFastcallVersion]);
+getSpawn('npm', ['install', '--no-save', '@teradataprebuilt/nativelib-' + os + '@' + teradataNativelibVersion]);
