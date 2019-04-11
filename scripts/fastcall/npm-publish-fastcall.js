@@ -4,7 +4,6 @@ var gulp = require('gulp');
 var fs = require('fs');
 var path = require('path');
 var spawn = require('child_process').spawnSync;
-var runSequence = require('run-sequence');
 var gunzip = require('gulp-gunzip');
 var untar = require('gulp-untar');
 
@@ -80,15 +79,14 @@ gulp.task('npm-publish', function (cb) {
         console.log('Published fastcall-' + os + '-' + platform + '-' + abiNumber);
       }
     }
+    cb();
   });
 });
 
 gulp.task('npm-logout', function (cb) {
   var cmd = getSpawn('npm', ['logout']);
   console.log('Published Fastcall successfully.');
-  cb(code);
+  cb();
 });
 
-gulp.task('publish-fastcall', function (cb) {
-  runSequence('prebuild', 'uncompress', 'npm-publish', 'npm-logout');
-});
+gulp.task('publish-fastcall', gulp.series('prebuild', 'uncompress', 'npm-publish', 'npm-logout'));
