@@ -8,9 +8,7 @@
     "test": "test"
   },
   "dependencies": {
-    "run-script-os": "^1.0.3",
-    "teradata-nativelib-darwin": "^1.0.0-beta.1.1",
-    "teradata-prebuilt-fastcall-darwin-node-v57": "^0.2.6-1"
+    "run-script-os": "^1.0.3"
   },
   "devDependencies": {
     "@types/chai": "^4.1.4",
