@@ -35,9 +35,9 @@
     "rimraf": "^2.5.4",
     "run-script-os": "^1.0.3",
     "fastcall": "^0.2.6",
-    "gulp": "3.9.1",
+    "gulp": "4.0.0",
+    "gulp-hub": "4.2.0",
     "require-dir": "0.3.2",
-    "run-sequence": "^1.2.2",
     "gulp-gunzip": "^1.1.0",
     "gulp-untar": "^0.0.8",
     "prebuild": "^8.1.2"

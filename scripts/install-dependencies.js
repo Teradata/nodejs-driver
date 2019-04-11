@@ -18,6 +18,7 @@ function getSpawn(command, args, options) {
 var platform = 'node';
 var abiVersion = process.versions.modules;
 var os = process.platform;
+var teradataPrebuiltFastcallVersion = '0.2.6';
+var teradataNativelibVersion = '1.0.0-beta.1';
 
-// getSpawn('npm', ['install', 'teradata-prebuilt-fastcall-' + os + '-' + platform + '-v' + abiVersion]);
-// getSpawn('npm', ['install', 'teradata-nativelib-' + os]);
+getSpawn('npm', ['install', '--no-save', '@teradataprebuilt/fastcall-' + os + '-' + platform + '-v' + abiVersion + '@' + teradataPrebuiltFastcallVersion, '@teradataprebuilt/nativelib-' + os + '@' + teradataNativelibVersion]);
