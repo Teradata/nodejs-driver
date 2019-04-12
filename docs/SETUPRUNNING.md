@@ -8,7 +8,7 @@
 ```
 "dependencies": {
   ...
-  "teradata-nodejsdriver": "1.0.0-beta.1"
+  "teradata-nodejs-driver": "1.0.0-beta.1"
   ...
 ```
 
