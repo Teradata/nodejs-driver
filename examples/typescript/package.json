@@ -17,6 +17,6 @@
     "clean": "rimraf dist",
     "lint": "tslint ./**/*.ts",
     "format": "tsfmt -r",
-    "build": "npm run clean && tsc --outDir dist src/*.ts"
+    "build": "npm run clean && tsc --outDir dist"
   }
 }
