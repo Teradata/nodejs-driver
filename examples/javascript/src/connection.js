@@ -2,8 +2,8 @@
 * This program demonstrates how to connect to Teradata database.
 */
 "use strict";
-var TeradataConnection = require("teradata-nodejsdriver/teradata-connection");
-var TeradataExceptions = require("teradata-nodejsdriver/teradata-exceptions");
+var TeradataConnection = require("teradata-nodejs-driver/teradata-connection");
+var TeradataExceptions = require("teradata-nodejs-driver/teradata-exceptions");
 var connParams = {
     host: '<host>',
     log: '0',

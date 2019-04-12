@@ -1,4 +1,4 @@
-import { TeradataConnection, ITDConnParams } from 'teradata-nodejsdriver';
+import { TeradataConnection, ITDConnParams } from 'teradata-nodejs-driver';
 
 export const connParams: ITDConnParams = {
   host: '<host>',
