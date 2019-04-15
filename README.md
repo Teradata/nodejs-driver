@@ -47,6 +47,7 @@ Operating Systems:
 * [Stored Password Protection](docs/STOREDPASSWORD.md)
 * [Data Types](docs/DATATYPES.md)
 * [Module Exceptions](docs/MODULEEXCEPTIONS.md)
+* [Tests](docs/RUNNINGTESTS.md)
 * [Examples](examples/README.md)
 
 ---

@@ -21,22 +21,8 @@
 * If when running an error occurs for finding the `ref.node` native module then run the following command as an administrator to install MSVC Redistributables 2015
   * `npm install --global windows-build-tools --vs2015`
 
+## Examples
+* [Examples](examples/README.md)
+
 ## Running Tests
-
-* After going through the `Setup` steps above:
-* Edit test/configurations.ts
-  * Modify the `'{ "host": "<hostname>", "user": "<username>", "password": "<password>" }'` with correct connection parameters
-* Run the Node.js Javascript test files:
-  * `npm run test`
-
-## Building prebuilt fastcall dependency and publish to npm
-
-* Install **cmake**
-  * [https://cmake.org/download/](https://cmake.org/download/)
-  * You may need to point your Path to the bin dir for cmake
-     * **(Mac only)** `export PATH=$PATH:/Applications/CMake.app/Contents/bin`
-* Install Node packages:
-  *  `cd scripts/fastcall`
-  *  `npm install`
-* Build os specific fastcall and publish binary to npm:
-  * `npm run publish-fastcall`
+* [Tests](docs/RUNNINGTESTS.md)
