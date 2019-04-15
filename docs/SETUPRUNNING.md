@@ -22,7 +22,7 @@
   * `npm install --global windows-build-tools --vs2015`
 
 ## Examples
-* [Examples](examples/README.md)
+* [Examples](../examples/README.md)
 
 ## Running Tests
-* [Tests](docs/RUNNINGTESTS.md)
+* [Tests](RUNNINGTESTS.md)

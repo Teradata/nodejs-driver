@@ -42,7 +42,7 @@ Operating Systems:
 
 ## Useful Information
 
-* [Setup and Running](docs/SETUPRUNNING.md)
+* [Setup](docs/SETUPRUNNING.md)
 * [Connection Parameters](docs/CONNECTIONPARAMS.md)
 * [Stored Password Protection](docs/STOREDPASSWORD.md)
 * [Data Types](docs/DATATYPES.md)
