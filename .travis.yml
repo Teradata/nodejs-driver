@@ -19,7 +19,7 @@ addons:
     branch_pattern: coverity_scan
   apt:
     packages:
-      - libssl
+      - libssl-dev
 node_js:
 - '10.15.3'
 branches:
