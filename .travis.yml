@@ -7,7 +7,7 @@ env:
    #   via the "travis encrypt" command using the project repo's public key
    - secure: "kd+L804rw2rLl85OMKvV7L002IQAec/VgSaMJ0o2/ZFIstV9N5OlgUQKNOrwtMXgwDB8xuno1HxO8qjcJOy2creEho2qhXv3xID+R9EO2+tuVouRVt43rBlsKZLztczyWw8EmwnFgkb+osfcH1XzLQlkbwd/nww23FIqxkqd0vgYZyWRm/ehjtgiwRX7YEEJD/WOOiYeL5AO8SWFRok4G3bwc645mSglwe5ADfE7eZHZeWK0Mqtc8YGayRaxCZkR7bTcnnn9QpTkO3pMkCpiyVtFDnA3Ueh6e1DZZVVQvZ2ZRQniZjXEG6VNIHvOqDD9vOfjRMmo0v4CuvrUkDIXdcmCqKbxGIL6o26e3WcRo0gYdhYtKbPImGaZPkvxCJgzyZE/HoSRPRyAWT/nVByErnCsuCxoibolP7tokI73KcYjHGN6ZZpP2f9EUe6lZlUyAFFzzYMESvV8dwjmsxzSvsCgi+qTeaPh7TyYHJ8mGjNyob4knnM8RuYaQ2SwoeYLWObfel/s7orHPosh9Oj2kTuaLaJzd4RAzxdd+MbIUpICRUWLZ2vG4Mrc/itAb6xc6c307YcUHa+qQvVpWAnIrBEjEsWyDuN2y5bo6QWzqlOZRo5+0EH0veCE5bR+PaeBYMZdZup20AM+SfRAY9mMMXcR4uVI7VTN6KcDyivg9k0="
 before_install:
-   - sudo wget --no-check-certificate https://entrust.com/root-certificates/entrust_ev_ca.cer -o /usr/local/share/ca-certificates/entrust_ssl_ca.crt 
+   - sudo wget --no-check-certificate https://entrust.com/root-certificates/entrust_2048_ca.cer -o /usr/local/share/ca-certificates/entrust_ssl_ca.crt 
    - sudo update-ca-certificates
    - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 addons:
