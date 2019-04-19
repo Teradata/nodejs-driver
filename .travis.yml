@@ -17,6 +17,9 @@ addons:
     build_command_prepend: "npm run build"
     build_command: "--no-command --fs-capture-search dist/"
     branch_pattern: coverity_scan
+  apt:
+    packages:
+      - ca-certificates
 node_js:
 - '10.15.3'
 branches:
