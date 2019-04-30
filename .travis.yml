@@ -7,9 +7,6 @@ env:
    # via the "travis encrypt" command using the project repo's public key
    - secure: "V68Oh8+t8NstjzSWThNSzXxwNh27mIC8GS2OjpBFtG6T5CrzfQ7Jb23Jin/crFL4s5bdiXnH4nvXg7Yicq9xTkOPJxXrwfPbGOEQKVzN+WUumIChzhoIUVMJMdKgpIj67SShMddsVZuvjnEzzIRwnYWvJ3VjiPu0byBGilJ499UdHV7cHiK/MqupHWGliMnXoj0pxbT/H8CSLLloOw168udR875svvs0CTkVM6dKHcTz1ybR+6/c8ejH/0SnVlGY7FrJRlTEy3l5n0mWXvCwuU5p3L5iLyUXCTHxEp37gS6f2lWKZeoCBCjvfm9lA3chxLcU2Ohn/XLCMKiIH/uPVUzusIW5vQpfyJH1LH3yZTVJXs5nBwdBrmy3BaHeTQoy7UB+2tvg8F/w8r5s4tb9gMDttHEomKlLsfJjDqx50OrlqgA3N6WMnfV6G1umYp4PRlgq7WG1lqvQmqrvjenE/fpDh9JRHOSYRhnctPfty8z4EgbOu1kBPkmQ7oUEdoeVuxzkAoSNini5I/E5BGZERSrOPStMJx+tAjU6jdm1nhbodF0tPX8vgKNTspLf7OvRXFHGs6N2abxkU5mgHI6OgVZ+trFUA7TqCvSv0GRhZ6hAIjp6mMTIS4ilM9m/siDvjHQNkxVdyREKaJnK5uzU3VSxsno6WO0R8E0nX8Jrm5I="
 before_install:
-   # Work around broken certificate of scan.coverity.com
-   - sudo curl -s -L https://entrust.com/root-certificates/entrust_l1k.cer -o /usr/local/share/ca-certificates/entrust_l1k.crt
-   - sudo update-ca-certificates
    - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 addons:
   coverity_scan:
@@ -29,7 +26,10 @@ jobs:
   include:
     - env: "MODE=coverity"
 install:
-- npm install
+  # Work around broken certificate of scan.coverity.com
+  - sudo curl -s -L https://entrust.com/root-certificates/entrust_l1k.cer -o /usr/local/share/ca-certificates/entrust_l1k.crt
+  - sudo update-ca-certificates
+  - npm install
 script:
 - ./scripts/ci/travis-script.sh
 cache:
