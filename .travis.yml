@@ -4,10 +4,10 @@ dist: trusty
 env:
   global:
    # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
-   # via the "travis encrypt" command using the project repo's public key
-   - secure: "l/GgknZ4N4dZo2D1TSzgbS3WSaLK3Xwde+KLFUmSvbN/bUPEIS+QSzhkjmgrtVlVZ57wLkW+bSMMBLdqQdXlDM2ThQtN9ZBNCeN5k6o0kvs9s4pKGAjO7oyVMzpYvuzRI1piAZk1POtm1Hi6ywvEVQj+e/LS0yo0Xtt3IxkgKBc5yA8lywcVURRKPMTmfY0/GJz1tZo5quS879CyNwy4Hvd+xa3GmOvNMSqT/wBjtLomymGh8h6UgtEuy0d4RiQExezORjjqtaP4X7LCh3mnpmvyqBHF2dGsPfb2nj1biz9vKKZjWVGnVdpKQDH6jJOOLHCxrPPklOXLe0TIYLSCY0DMqbeMELxs2K6Btv3D/a6BiiikwHgymcD0CwAx1cL/fvrMZhcR2p6ey3Vkm/sphX6Gh1JnEr9AD4G73069p5pM/Zopujd5KBgUlDVtgjFD7ADwc0aeNOr5TqIGPgmy/GPWWylJi62KpT3rPYEhCbhYI9SQOf1EGS/LpysXyRQ2iTaiOlerEZ1n7c4O35okL61JcWOSWAwBOmXaNUJvmbcASCl2F3cOhUNrlzkJQncIRQcx/HNAWOahAu/36DEj7mhuveC+1Y2yfsRGIcyZWeybINXjXakJV2UXbjr1mayI9EIPX6Xe3AZa27d+HpYmpow7cR32AP1yLBc8XDGfUCM="
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "kohZLa9oJRF4I4uMwa8vgHICrj0AqJ/vb1uC2HX+vEIm0hYvfGRQs6uiz4tMeXRZkr+14w8OVyD9dMT3Oke0+PqlM7rBhXc3pCYp9nGyaDt0+wZlDlmh49AO/KK/u+cAFi1fU8p/7hpYfYlTi0lCjZ5asbQtDbJmL9zVALuCpLNpit8gp+SYzTqkyo0X2FAuFkDSsSmTHYHcFBfj2JwW7we+ExYinY4NSRnFNN3+8Ihe1zsi0B8hPHLuouWgRKjQFBEqlmqZydEyHgO9MSmyrDYJZUIQbbsJHu+c50HH4S0M9Ni/hMjXsUreLysgZSIC9TG/akBVXxdGyqUCyt+mNjppT0vwmWV+4GcEo43Ww7cB8vA3T0Srt0koZG1jd8lH21ugOnKXMVsZAfPIMmr8ToDV+2UHK6bcBfpjU0PF/evEnXvMAbxwtZphumIzx3+wKs69ImmaFMA80IYKB1SnBE3mH3qZ8oCTVh7Qd4d8p2oX4qAGNRZvNLp9HaO/Jzox8YIYLcPj6Lwa7nSFlQaVxAAiI4gy6wOannyprRVVZVUx7SJgCn2PLBVEYinyBzSefSUDBVTRlQYuz7dQmH2O3MQeMG8nGtPcdZ4+7rpgrnvIMb0l0igBFBWF5gtzsxMf+fJR+K7wk4CFETT9qptjonHuRuf9wFcgkHZsua2iIIE="
 before_install:
-   - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+  - echo -n | openssl s_client -connect scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
 addons:
   coverity_scan:
     project:
@@ -26,10 +26,7 @@ jobs:
   include:
     - env: "MODE=coverity"
 install:
-  # Work around broken certificate of scan.coverity.com
-  - sudo curl -s -L https://entrust.com/root-certificates/entrust_l1k.cer -o /usr/local/share/ca-certificates/entrust_l1k.crt
-  - sudo update-ca-certificates
-  - npm install
+- npm install
 script:
 - ./scripts/ci/travis-script.sh
 cache:
