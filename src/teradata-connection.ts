@@ -72,11 +72,11 @@ export class TeradataConnection {
     // Setup libpath for fastcall.library
     let libpath: string = '';
     if (process.platform === 'win32') {
-      libpath = __dirname + '/node_modules/@teradataprebuilt/nativelib-win32/teradatasql.dll';
+      libpath = 'node_modules/@teradataprebuilt/nativelib-win32/teradatasql.dll';
     } else if (process.platform === 'darwin') {
-      libpath = __dirname + '/node_modules/@teradataprebuilt/nativelib-darwin/teradatasql.dylib';
+      libpath = 'node_modules/@teradataprebuilt/nativelib-darwin/teradatasql.dylib';
     } else if (process.platform === 'freebsd' || process.platform === 'linux') {
-      libpath = __dirname + '/node_modules/@teradataprebuilt/nativelib-linux/teradatasql.so';
+      libpath = 'node_modules/@teradataprebuilt/nativelib-linux/teradatasql.so';
     }
 
     // Load native library with libpath and options
