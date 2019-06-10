@@ -3,7 +3,7 @@
   "description": "node.js teradata driver example using typescript",
   "version": "1.0.0-alpha.1",
   "dependencies": {
-    "teradata-nodejs-driver": "1.0.0-beta.1"
+    "teradata-nodejs-driver": "1.0.0-beta.2"
   },
   "devDependencies": {
     "@types/node": "^10.5.7",
