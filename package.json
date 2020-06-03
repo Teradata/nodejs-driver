@@ -8,7 +8,6 @@
     "test": "test"
   },
   "dependencies": {
-    "@teradataprebuilt/nativelib-darwin": "^1.0.0-beta.1",
     "run-script-os": "^1.0.3"
   },
   "devDependencies": {
@@ -40,9 +39,7 @@
     "build:win32": "npm run clean && tsc",
     "build:darwin": "npm run clean && tsc",
     "build:linux": "npm run clean && tsc",
-    "publish": "npm run build && gulp publish-nodejsdriver",
-    "install": "node scripts/install-dependencies.js",
-    "i": "node scripts/install-dependencies.js"
+    "publish": "npm run build && gulp publish-nodejsdriver"
   },
   "repository": {
     "type": "git",
