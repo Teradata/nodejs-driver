@@ -24,4 +24,4 @@ var teradataNativelibVersion = '1.0.0-beta.1';
 var app_root_dir = path.resolve(__dirname).split('node_modules')[0];
 
 process.chdir(app_root_dir);
-getSpawn('npm', ['install', '--save', '@teradataprebuilt/fastcall-' + os + '-' + platform + '-v' + abiVersion + '@' + teradataPrebuiltFastcallVersion, '@teradataprebuilt/nativelib-' + os + '@' + teradataNativelibVersion]);
+getSpawn('npm', ['install', '--save', '@teradataprebuilt/nativelib-' + os + '@' + teradataNativelibVersion]);

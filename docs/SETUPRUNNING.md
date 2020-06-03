@@ -1,14 +1,14 @@
 ## Setup
 
 ### NPM
-* Ensure you have **Node 8.x+** (on a Mac use Homebrew and `brew install node@8.9.4`)
-* Ensure you have **npm 3.x+** installed.
+* Ensure you have **Node 12.x+** (on a Mac use Homebrew and `brew install node@12.18.0`)
+* Ensure you have **npm 6.x+** installed.
 * Add the dependency to your project. In the dependencies section of the package.json add:
 
 ```
 "dependencies": {
   ...
-  "teradata-nodejs-driver": "1.0.0-beta.2"
+  "teradata-nodejs-driver": "1.0.0-rc.1
   ...
 ```
 
