@@ -15,9 +15,6 @@ function getSpawn(command, args, options) {
   }
 }
 
-// var platform = (typeof window != 'undefined' && (window)['process']) ? 'electron' : 'node';
-var platform = 'node';
-var abiVersion = process.versions.modules;
 var os = process.platform;
 var teradataNativelibVersion = '1.0.0-beta.1';
 var app_root_dir = path.resolve(__dirname).split('node_modules')[0];
