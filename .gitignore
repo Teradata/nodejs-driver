@@ -19,7 +19,6 @@ src/node_modules
 # dependencies
 /node_modules
 /bower_components
-/scripts/fastcall/node_modules
 /scripts/godriver/node_modules
 
 # IDEs and editors

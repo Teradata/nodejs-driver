@@ -19,7 +19,6 @@ function getSpawn(command, args, options) {
 var platform = 'node';
 var abiVersion = process.versions.modules;
 var os = process.platform;
-var teradataPrebuiltFastcallVersion = '0.2.6';
 var teradataNativelibVersion = '1.0.0-beta.1';
 var app_root_dir = path.resolve(__dirname).split('node_modules')[0];
 
