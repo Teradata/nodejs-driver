@@ -43,4 +43,4 @@ gulp.task('npm-logout', function (cb) {
   });
 });
 
-gulp.task('publish-nodejsdriver', gulp.series('update-package-json', 'npm-publish', 'npm-publish', 'npm-logout'));
+gulp.task('publish-nodejsdriver', gulp.series('update-package-json', 'npm-publish', 'npm-logout'));
