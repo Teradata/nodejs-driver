@@ -17,7 +17,7 @@ addons:
     build_command: "--no-command --fs-capture-search dist/"
     branch_pattern: coverity_scan
 node_js:
-- '10.15.3'
+- '12.18.0'
 branches:
   only:
     - coverity_scan
@@ -25,7 +25,7 @@ jobs:
   include:
     - env: "MODE=coverity"
 install:
-- npm install
+- npm ci
 script:
 - ./scripts/ci/travis-script.sh
 cache:
