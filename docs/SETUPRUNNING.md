@@ -5,11 +5,22 @@
 * Ensure you have **npm 6.x+** installed.
 * Add the dependency to your project. In the dependencies section of the package.json add:
 
+For Node.js 8.x, 9.x, 10.x, 11.x use:
 ```
+...
 "dependencies": {
-  ...
-  "teradata-nodejs-driver": "1.0.0-rc.1
-  ...
+  "teradata-nodejs-driver": "1.0.0-beta.2"
+}
+...
+```
+
+For Node.js 12.x and greater use:
+```
+...
+"dependencies": {
+  "teradata-nodejs-driver": "1.0.0-rc.1"
+}
+...
 ```
 
 * Install the driver npm package into a project
