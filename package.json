@@ -8,6 +8,7 @@
     "test": "test"
   },
   "dependencies": {
+    "ref-array-di": "^1.2.1",
     "run-script-os": "^1.0.3"
   },
   "devDependencies": {

@@ -3,6 +3,8 @@
 let ffi: any = require('ffi-napi');
 /* tslint:disable-next-line */
 let ref: any = require('ref-napi');
+/* tslint:disable-next-line */
+let ArrayType: any = require('ref-array-di')(ref);
 
 import { TeradataCursor } from './teradata-cursor';
 import { TeradataLogging } from './teradata-logging';
@@ -41,7 +43,7 @@ export class TeradataConnection {
   constructor() {
     this.poolHandle = null;
     this.ref = ref;
-    this.byteArray = this.ref.types.byte;
+    this.byteArray = new ArrayType('byte');
     this.logLevel = 0;
     this.logger = new TeradataLogging(this.logLevel);
 
