@@ -18,7 +18,7 @@ For Node.js 12.x and greater use:
 ```
 ...
 "dependencies": {
-  "teradata-nodejs-driver": "1.0.0-rc.1"
+  "teradata-nodejs-driver": "1.0.0-rc.2"
 }
 ...
 ```
