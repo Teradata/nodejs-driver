@@ -13,7 +13,7 @@ jobs:
     - env: "MODE=lint"
     - env: "MODE=audit"
 install:
-- npm install
+- npm ci
 script:
 - ./scripts/ci/travis-script.sh
 cache:
