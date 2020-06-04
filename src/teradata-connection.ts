@@ -1,23 +1,10 @@
 // Get the Teradata Native Binding
-let fastcall: any;
 /* tslint:disable-next-line */
-// let platform: string = (typeof window !== 'undefined' && (<any>window)['process']) ? 'electron' : 'node';
-let platform: string = 'node';
-let abiVersion: string = process.versions.modules;
-
-if (process.platform === 'win32') {
-  /* tslint:disable-next-line */
-  fastcall = require('@teradataprebuilt/fastcall-win32-' + platform + '-v' + abiVersion);
-} else if (process.platform === 'darwin') {
-  /* tslint:disable-next-line */
-  fastcall = require('@teradataprebuilt/fastcall-darwin-' + platform + '-v' + abiVersion);
-} else if (process.platform === 'freebsd') {
-  /* tslint:disable-next-line */
-  fastcall = require('@teradataprebuilt/fastcall-freebsd-' + platform + '-v' + abiVersion);
-} else if (process.platform === 'linux') {
-  /* tslint:disable-next-line */
-  fastcall = require('@teradataprebuilt/fastcall-linux-' + platform + '-v' + abiVersion);
-}
+let ffi: any = require('ffi-napi');
+/* tslint:disable-next-line */
+let ref: any = require('ref-napi');
+/* tslint:disable-next-line */
+let ArrayType: any = require('ref-array-di')(ref);
 
 import { TeradataCursor } from './teradata-cursor';
 import { TeradataLogging } from './teradata-logging';
@@ -47,7 +34,6 @@ export class TeradataConnection {
 
   private poolHandle: number;
   private lib: any;
-  private library: any;
   private ref: any;
   private byteArray: any;
   private logLevel: number;
@@ -56,20 +42,12 @@ export class TeradataConnection {
 
   constructor() {
     this.poolHandle = null;
-    this.library = fastcall.Library;
-    this.ref = fastcall.ref;
-    const ArrayType: any = fastcall.ArrayType;
-    this.byteArray = new ArrayType('byte');
+    this.ref = ref;
+    this.byteArray = new ArrayType(this.ref.types.byte);
     this.logLevel = 0;
     this.logger = new TeradataLogging(this.logLevel);
 
-    // Setup function call mode for fastcall.library
-    const options: {} = {
-      defaultCallMode: 1, // callMode.sync
-      syncMode: 0,        // defs.syncMode.none
-    };
-
-    // Setup libpath for fastcall.library
+    // Setup libpath for ffi.library
     let libpath: string = '';
     if (process.platform === 'win32') {
       libpath = 'node_modules/@teradataprebuilt/nativelib-win32/teradatasql.dll';
@@ -79,19 +57,19 @@ export class TeradataConnection {
       libpath = 'node_modules/@teradataprebuilt/nativelib-linux/teradatasql.so';
     }
 
-    // Load native library with libpath and options
-    this.lib = new this.library(libpath, options);
-
-    // Declare functions
-    this.lib.function({jsgoCreateConnection: ['void', ['long', 'char*', 'char*', 'char**', this.ref.refType(this.ref.types.ulonglong)]]});
-    this.lib.function({jsgoCloseConnection: ['void', ['long', 'long', 'char**']]});
-    this.lib.function({jsgoCreateRows: ['void', ['long', 'long', 'char*', 'long', 'void*', 'char**', this.ref.refType(this.ref.types.ulonglong)]] });
-    this.lib.function({jsgoFetchRow: ['void', ['long', 'long', 'char**', this.ref.refType(this.ref.types.int), 'void**']] });
-    this.lib.function({jsgoResultMetaData: ['void', ['long', 'long', 'char**',
-                                         this.ref.refType(this.ref.types.ulonglong), this.ref.refType(this.ref.types.int), 'void**']] });
-    this.lib.function({jsgoNextResult: ['void', ['long', 'long', 'char**', 'char*']] });
-    this.lib.function({jsgoCloseRows: ['void', ['long', 'long', 'char**']] });
-    this.lib.function({jsgoFreePointer: ['void', ['long', 'void*']] });
+    // Load native library with libpath and declare functions
+    this.lib = ffi.Library(libpath,
+      {
+        'jsgoCreateConnection': ['void', ['long', 'char*', 'char*', 'char**', this.ref.refType(this.ref.types.ulonglong)]],
+        'jsgoCloseConnection': ['void', ['long', 'long', 'char**']],
+        'jsgoCreateRows': ['void', ['long', 'long', 'char*', 'long', 'void*', 'char**', this.ref.refType(this.ref.types.ulonglong)]],
+        'jsgoFetchRow': ['void', ['long', 'long', 'char**', this.ref.refType(this.ref.types.int), 'void**']],
+        'jsgoResultMetaData': ['void', ['long', 'long', 'char**',
+          this.ref.refType(this.ref.types.ulonglong), this.ref.refType(this.ref.types.int), 'void**']],
+        'jsgoNextResult': ['void', ['long', 'long', 'char**', 'char*']],
+        'jsgoCloseRows': ['void', ['long', 'long', 'char**']],
+        'jsgoFreePointer': ['void', ['long', 'void*']],
+      });
   }
 
   // All DBAPI 2.0 methods
@@ -114,11 +92,11 @@ export class TeradataConnection {
     this.logger = new TeradataLogging(this.logLevel);
     this.logger.traceLogMessage('entering connect()');
     try {
-      const jsgoFreePointer: any = this.lib.interface.jsgoFreePointer;
+      const jsgoFreePointer: any = this.lib.jsgoFreePointer;
       const inputString: any = this.ref.allocCString(JSON.stringify(databaseConnParams));
       const sVersionNumberPtr: any = this.ref.allocCString(this.sVersionNumber);
       const cStringPtrType: any = this.ref.refType(this.ref.types.char);
-      const jsgoCreateConnection: any = this.lib.interface.jsgoCreateConnection;
+      const jsgoCreateConnection: any = this.lib.jsgoCreateConnection;
       const poolHandlePtr: any = this.ref.alloc(this.ref.types.ulonglong);
       const outputPtrPtr: any = this.ref.alloc(cStringPtrType);
 
@@ -140,8 +118,8 @@ export class TeradataConnection {
   public close(): void {
     this.logger.traceLogMessage('entering close()');
     try {
-      const jsgoCloseConnection: any = this.lib.interface.jsgoCloseConnection;
-      const jsgoFreePointer: any = this.lib.interface.jsgoFreePointer;
+      const jsgoCloseConnection: any = this.lib.jsgoCloseConnection;
+      const jsgoFreePointer: any = this.lib.jsgoFreePointer;
       const cStringPtrType: any = this.ref.refType(this.ref.types.char);
       const outputPtrPtr: any = this.ref.alloc(cStringPtrType);
 
