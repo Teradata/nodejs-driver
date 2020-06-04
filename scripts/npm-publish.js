@@ -20,7 +20,7 @@ function getSpawn(command, args, options) {
 }
 
 gulp.task('update-package-json', function (cb) {
-  process.chdir('dist');
+  process.chdir('..' + path.sep + 'dist');
   fs.copyFileSync('..' + path.sep + 'package.json', 'package.json');
   fs.copyFileSync('..' + path.sep + 'README.md', 'README.md');
   fs.mkdirSync('scripts');

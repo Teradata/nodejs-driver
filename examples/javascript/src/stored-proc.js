@@ -3,8 +3,8 @@
 * with a variety of parameters and dynamic result sets.
 */
 "use strict";
-var TeradataConnection = require("teradata-nodejsdriver/teradata-connection");
-var TeradataExceptions = require("teradata-nodejsdriver/teradata-exceptions");
+var TeradataConnection = require("teradata-nodejs-driver/teradata-connection");
+var TeradataExceptions = require("teradata-nodejs-driver/teradata-exceptions");
 var connParams = {
     host: '<host>',
     log: '0',

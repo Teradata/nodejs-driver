@@ -3,9 +3,9 @@
 * with a variety of parameters and dynamic result sets.
 */
 
-import { TeradataConnection, ITDConnParams } from 'teradata-nodejsdriver/teradata-connection';
-import { TeradataCursor } from 'teradata-nodejsdriver/teradata-cursor';
-import { OperationalError } from 'teradata-nodejsdriver/teradata-exceptions';
+import { TeradataConnection, ITDConnParams } from 'teradata-nodejs-driver/teradata-connection';
+import { TeradataCursor } from 'teradata-nodejs-driver/teradata-cursor';
+import { OperationalError } from 'teradata-nodejs-driver/teradata-exceptions';
 
 export const connParams: ITDConnParams = {
   host: '<host>',

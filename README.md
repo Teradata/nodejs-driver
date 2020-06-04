@@ -17,7 +17,7 @@
 
 The Teradata nodejs-driver module is a Database API Specification v2.0 compliant driver for Node.js and the Teradata Database.
 
-Teradata nodejs-driver is open source and maintained by Teradata. It is currently in Beta but has a comprehensive test suite for the supported features.
+Teradata nodejs-driver is open source and maintained by Teradata. It is currently in RC but has a comprehensive test suite for the supported features.
 
 Database API Specification v2.0: https://www.python.org/dev/peps/pep-0249/
 
@@ -25,9 +25,20 @@ Database API Specification v2.0: https://www.python.org/dev/peps/pep-0249/
 
 ## Supported Platforms
 
-Node.js:
+For Node.js 8.x, 9.x, 10.x, 11.x use:
+```
+"dependencies": {
+  "teradata-nodejs-driver": "1.0.0-beta.2"
+}
+```
 
-* 8.x, 9.x, 10.x, 11.x
+For Node.js 12.x and greater use:
+```
+"dependencies": {
+  "teradata-nodejs-driver": "1.0.0-rc.1"
+}
+```
+
 
 Operating Systems:
 
@@ -42,11 +53,12 @@ Operating Systems:
 
 ## Useful Information
 
-* [Setup and Running](docs/SETUPRUNNING.md)
+* [Setup](docs/SETUPRUNNING.md)
 * [Connection Parameters](docs/CONNECTIONPARAMS.md)
 * [Stored Password Protection](docs/STOREDPASSWORD.md)
 * [Data Types](docs/DATATYPES.md)
 * [Module Exceptions](docs/MODULEEXCEPTIONS.md)
+* [Tests](docs/RUNNINGTESTS.md)
 * [Examples](examples/README.md)
 
 ---
@@ -55,7 +67,7 @@ Operating Systems:
 
 The MIT License
 
-Copyright (c) 2019 by Teradata. All rights reserved. http://teradata.com
+Copyright (c) 2020 by Teradata. All rights reserved. http://teradata.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

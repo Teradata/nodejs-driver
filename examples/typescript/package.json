@@ -3,7 +3,7 @@
   "description": "node.js teradata driver example using typescript",
   "version": "1.0.0-alpha.1",
   "dependencies": {
-    "teradata-nodejsdriver": "1.0.0-beta.1"
+    "teradata-nodejs-driver": "1.0.0-rc.1"
   },
   "devDependencies": {
     "@types/node": "^10.5.7",
@@ -17,6 +17,6 @@
     "clean": "rimraf dist",
     "lint": "tslint ./**/*.ts",
     "format": "tsfmt -r",
-    "build": "npm run clean && tsc --outDir dist src/*.ts"
+    "build": "npm run clean && tsc --outDir dist"
   }
 }

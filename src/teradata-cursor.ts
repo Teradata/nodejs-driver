@@ -23,11 +23,11 @@ export class TeradataCursor {
   private byteArray: any;
   private logger: TeradataLogging;
 
-  constructor(connection: TeradataConnection, fastcallLib: any, fastcallRef: any, fastcallByteArray: any) {
+  constructor(connection: TeradataConnection, ffiLib: any, ffiRef: any, ffiByteArray: any) {
     this.conn = connection;
-    this.lib = fastcallLib;
-    this.ref = fastcallRef;
-    this.byteArray = fastcallByteArray;
+    this.lib = ffiLib;
+    this.ref = ffiRef;
+    this.byteArray = ffiByteArray;
     this.logger = new TeradataLogging(this.conn.uLog);
     this.rowTerminatorTA = new Uint8Array(this.rowTerminator.length);
     this.rowTerminatorTA[0] = this.rowTerminator.charCodeAt(0);
@@ -84,8 +84,8 @@ export class TeradataCursor {
   close(): void {
     this.logger.traceLogMessage('entering close()');
     try {
-      const jsgoCloseRows: any = this.lib.interface.jsgoCloseRows;
-      const jsgoFreePointer: any = this.lib.interface.jsgoFreePointer;
+      const jsgoCloseRows: any = this.lib.jsgoCloseRows;
+      const jsgoFreePointer: any = this.lib.jsgoFreePointer;
       const cStringPtrType: any = this.ref.refType(this.ref.types.char);
       const outputPtrPtr: any = this.ref.alloc(cStringPtrType);
 
@@ -126,8 +126,8 @@ export class TeradataCursor {
     this.logger.debugLogMessage(seqOfParameters, true);
 
     try {
-      const jsgoCreateRows: any = this.lib.interface.jsgoCreateRows;
-      const jsgoFreePointer: any = this.lib.interface.jsgoFreePointer;
+      const jsgoCreateRows: any = this.lib.jsgoCreateRows;
+      const jsgoFreePointer: any = this.lib.jsgoFreePointer;
       const procnamePtr: any = this.ref.allocCString(procname);
 
       let abyBindValuesBuffer: Buffer = Buffer.allocUnsafe(0);
@@ -265,8 +265,8 @@ export class TeradataCursor {
     this.logger.traceLogMessage('entering nextset()');
     try {
       if (this.uRowsHandle) {
-        const jsgoNextResult: any = this.lib.interface.jsgoNextResult;
-        const jsgoFreePointer: any = this.lib.interface.jsgoFreePointer;
+        const jsgoNextResult: any = this.lib.jsgoNextResult;
+        const jsgoFreePointer: any = this.lib.jsgoFreePointer;
         const cStringPtrType: any = this.ref.refType(this.ref.types.char);
         const outputPtrPtr: any = this.ref.alloc(cStringPtrType);
         const availPtr: any = this.ref.allocCString('C');
@@ -309,8 +309,8 @@ export class TeradataCursor {
     this.logger.traceLogMessage('entering next()');
     try {
       if (this.uRowsHandle) {
-        const jsgoFetchRow: any = this.lib.interface.jsgoFetchRow;
-        const jsgoFreePointer: any = this.lib.interface.jsgoFreePointer;
+        const jsgoFetchRow: any = this.lib.jsgoFetchRow;
+        const jsgoFreePointer: any = this.lib.jsgoFreePointer;
         const cStringPtrType: any = this.ref.refType(this.ref.types.char);
         const outputPtrPtr: any = this.ref.alloc(cStringPtrType);
         const columnValuesByteCountPtr: any = this.ref.alloc(this.ref.types.int);
@@ -383,8 +383,8 @@ export class TeradataCursor {
   private _obtainResultMetaData(): void {
     this.logger.traceLogMessage('entering _obtainResultMetaData()');
     try {
-      const jsgoResultMetaData: any = this.lib.interface.jsgoResultMetaData;
-      const jsgoFreePointer: any = this.lib.interface.jsgoFreePointer;
+      const jsgoResultMetaData: any = this.lib.jsgoResultMetaData;
+      const jsgoFreePointer: any = this.lib.jsgoFreePointer;
       const cStringPtrType: any = this.ref.refType(this.ref.types.char);
       const outputPtrPtr: any = this.ref.alloc(cStringPtrType);
       const metaDataByteCountPtr: any = this.ref.alloc(this.ref.types.int);

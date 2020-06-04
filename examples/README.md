@@ -3,8 +3,8 @@
 ### Setup
 
 #### NPM
-* Ensure you have **Node 8.x+** (on a Mac use Homebrew and `brew install node@8.9.4`)
-* Ensure you have **npm 3.x+** installed.
+* Ensure you have **Node 12.x+** (on a Mac use Homebrew and `brew install node@12.18.0`)
+* Ensure you have **npm 6.x+** installed.
 
 #### MSVC Redistributables 2015 (Microsoft Windows only)
 * MSVC Redistributables are required to run the Teradata Node.js Driver on Microsoft Windows
@@ -33,7 +33,7 @@
 ### Run Examples
 
 #### Typescript
-Modify the following section with correct connection parameters in `each` example file before running:
+Modify the following section with correct connection parameters in `each` example typescript file before running:
 ```
 const connParams: ITDConnParams = {
   host: '<host>',
@@ -74,7 +74,7 @@ const connParams: ITDConnParams = {
   * Click to view source in : [typescript/src/stored-proc.ts](typescript/src/stored-proc.ts)
   * Run example from command line: `node dist/stored-proc.js`
 #### Javascript
-Modify the following section with correct connection parameters in `each` example file before running:
+Modify the following section with correct connection parameters in `each` example javascript file before running:
 ```
 var connParams = {
   host: '<host>',

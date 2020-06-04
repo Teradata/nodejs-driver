@@ -1,6 +1,7 @@
 'use strict';
 
 var spawn = require('child_process').spawnSync;
+var path = require('path');
 
 function getSpawn(command, args, options) {
   if (!/^win/.test(process.platform)) { // linux
@@ -14,11 +15,9 @@ function getSpawn(command, args, options) {
   }
 }
 
-// var platform = (typeof window != 'undefined' && (window)['process']) ? 'electron' : 'node';
-var platform = 'node';
-var abiVersion = process.versions.modules;
 var os = process.platform;
-var teradataPrebuiltFastcallVersion = '0.2.6';
 var teradataNativelibVersion = '1.0.0-beta.1';
+var app_root_dir = path.resolve(__dirname).split('node_modules')[0];
 
-getSpawn('npm', ['install', '--no-save', '@teradataprebuilt/fastcall-' + os + '-' + platform + '-v' + abiVersion + '@' + teradataPrebuiltFastcallVersion, '@teradataprebuilt/nativelib-' + os + '@' + teradataNativelibVersion]);
+process.chdir(app_root_dir);
+getSpawn('npm', ['install', '--save', '@teradataprebuilt/nativelib-' + os + '@' + teradataNativelibVersion]);

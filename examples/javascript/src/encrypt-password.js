@@ -281,8 +281,8 @@
 *                  ENCRYPTED_PASSWORD(file:/dir1/JohnDoeKey.properties,file:/dir2/JohnDoePass.properties)
 */
 "use strict";
-var TeradataConnection = require("teradata-nodejsdriver/teradata-connection");
-var TeradataExceptions = require("teradata-nodejsdriver/teradata-exceptions");
+var TeradataConnection = require("teradata-nodejs-driver/teradata-connection");
+var TeradataExceptions = require("teradata-nodejs-driver/teradata-exceptions");
 var fs = require("fs");
 var crypto = require("crypto");
 function convertJavaNamestoNodeJs(sName, nKeySizeInBits, sMode) {
