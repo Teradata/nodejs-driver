@@ -43,7 +43,7 @@ export class TeradataConnection {
   constructor() {
     this.poolHandle = null;
     this.ref = ref;
-    this.byteArray = new ArrayType('byte');
+    this.byteArray = new ArrayType(this.ref.types.byte);
     this.logLevel = 0;
     this.logger = new TeradataLogging(this.logLevel);
 
