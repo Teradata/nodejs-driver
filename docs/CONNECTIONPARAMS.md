@@ -23,3 +23,13 @@ Parameter          | Default     | Type           | Description
 `teradata_values`  | `"true"`    | quoted boolean | Controls whether `str` or a more specific Python data type is used for certain Result set column value types. Refer to the table below for details.
 `tmode`            | `"DEFAULT"` | string         | Specifies the transaction mode. Equivalent to the Teradata JDBC Driver TMODE connection parameter. Possible values are `DEFAULT` (the default), `ANSI`, or `TERA`.
 `user`             |             | string         | Specifies the Teradata Database username. Equivalent to the Teradata JDBC Driver `USER` connection parameter.
+
+### Connection Configuration
+
+There are some additional configuration options for the library that are not relevant for Teradata. These options
+are passed to the Teradata Connection constructor.
+
+Parameter          | Default     | Type           | Description
+------------------ | ----------- | -------------- | ---
+`base_path`        | `""`        | string         | Set a base directory for node_modules, default is current directory. __NB__ Must have trailing slash `/` e.g. `/opt/nodejs/`
+
