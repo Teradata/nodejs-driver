@@ -8,6 +8,7 @@
     "test": "test"
   },
   "dependencies": {
+    "@teradataprebuilt/nativelib-win32": "^1.0.0-beta.1",
     "ffi-napi": "^3.0.1",
     "ref-array-di": "^1.2.1",
     "ref-napi": "^2.0.2",
