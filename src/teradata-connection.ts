@@ -30,6 +30,19 @@ export interface ITDConnParams {
   user: string;
 }
 
+/**
+ * Configures the connection set-up internally. This is configuration
+ * not relating to Teradata itself but rather the library set-up.
+ */
+export interface ITDConnConf {
+  /**
+   * If your node_modules directory is not found in the root directory
+   * add your root path _including_ a trailing slash. E.g for AWS Lambda:
+   * `/opt/nodejs/`
+   */
+  base_path?: string;
+}
+
 export class TeradataConnection {
 
   private poolHandle: number;
@@ -40,7 +53,7 @@ export class TeradataConnection {
   private logger: TeradataLogging;
   private sVersionNumber: string = '42659830765e8ee7b720b821cd0b35677b82dbd5'; // Version Number
 
-  constructor() {
+  constructor(configuration: ITDConnConf = {base_path: ''}) {
     this.poolHandle = null;
     this.ref = ref;
     this.byteArray = new ArrayType(this.ref.types.byte);
@@ -48,13 +61,13 @@ export class TeradataConnection {
     this.logger = new TeradataLogging(this.logLevel);
 
     // Setup libpath for ffi.library
-    let libpath: string = '';
+    let libpath: string = configuration.base_path;
     if (process.platform === 'win32') {
-      libpath = 'node_modules/@teradataprebuilt/nativelib-win32/teradatasql.dll';
+      libpath += 'node_modules/@teradataprebuilt/nativelib-win32/teradatasql.dll';
     } else if (process.platform === 'darwin') {
-      libpath = 'node_modules/@teradataprebuilt/nativelib-darwin/teradatasql.dylib';
+      libpath += 'node_modules/@teradataprebuilt/nativelib-darwin/teradatasql.dylib';
     } else if (process.platform === 'freebsd' || process.platform === 'linux') {
-      libpath = 'node_modules/@teradataprebuilt/nativelib-linux/teradatasql.so';
+      libpath += 'node_modules/@teradataprebuilt/nativelib-linux/teradatasql.so';
     }
 
     // Load native library with libpath and declare functions
