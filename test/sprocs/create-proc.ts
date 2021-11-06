@@ -5,6 +5,7 @@ import { TeradataCursor } from '../../src/teradata-cursor';
 import { connParams } from '../configurations';
 import { TeradataLogging } from '../../src/teradata-logging';
 import { OperationalError } from '../../src/teradata-exceptions';
+import { fail } from 'assert';
 
 const logger: TeradataLogging = new TeradataLogging();
 let teradataConnection: TeradataConnection;
@@ -123,6 +124,7 @@ describe('\n\n\nCreate Procedure Tests', () => {
       aaoActualValues = cursor.fetchall();
     } catch (error) {
       logger.errorLogMessage(error.message); // unexpected error
+      fail();
     } finally {
       expect(actualErrorCount).equal(expectedErrorCount);
       expect(aaoActualValues).to.deep.equal(aaoExpectedValues);

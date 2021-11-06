@@ -30,18 +30,18 @@
     "typescript": "^3.9.3",
     "typescript-formatter": "^7.2.2"
   },
+  "optionalDependencies": {
+    "@teradataprebuilt/nativelib-darwin": "^1.0.0-beta.1",
+    "@teradataprebuilt/nativelib-win32": "^1.0.0-beta.1",
+    "@teradataprebuilt/nativelib-linux": "^1.0.0-beta.1"
+  },
   "scripts": {
-    "test": "rimraf src/node_modules && gulp copy-native-lib-for-test && npm run build && mocha -r ts-node/register test/**/*.ts",
+    "test": "rimraf src/node_modules && npm run build && mocha --bail --timeout 500000 -r ts-node/register test/**/*.ts",
     "clean": "rimraf dist",
     "lint": "tslint ./src/**/*.ts ./test/**/*.ts ./examples/typescript/src/*.ts",
     "format": "tsfmt -r",
-    "build": "run-script-os",
-    "build:win32": "npm run clean && tsc",
-    "build:darwin": "npm run clean && tsc",
-    "build:linux": "npm run clean && tsc",
-    "publish": "npm run build && gulp publish-nodejsdriver",
-    "install": "node scripts/install-dependencies.js",
-    "i": "node scripts/install-dependencies.js"
+    "build": "npm run clean && tsc",
+    "publish": "npm run build && gulp publish-nodejsdriver"
   },
   "repository": {
     "type": "git",
