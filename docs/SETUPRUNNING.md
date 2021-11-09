@@ -1,8 +1,8 @@
 ## Setup
 
 ### NPM
-* Ensure you have **Node 12.x+** (on a Mac use Homebrew and `brew install node@12.18.0`)
-* Ensure you have **npm 6.x+** installed.
+* Ensure you have **Node 12.x** (on a Mac use Homebrew and `brew install node@12.18.0`)
+* Ensure you have **npm 6.x** installed.
 * Add the dependency to your project. In the dependencies section of the package.json add:
 
 For Node.js 8.x, 9.x, 10.x, 11.x use:
@@ -14,11 +14,11 @@ For Node.js 8.x, 9.x, 10.x, 11.x use:
 ...
 ```
 
-For Node.js 12.x and greater use:
+For Node.js 12.x use:
 ```
 ...
 "dependencies": {
-  "teradata-nodejs-driver": "1.0.0-rc.2"
+  "teradata-nodejs-driver": "1.0.0-rc.5"
 }
 ...
 ```
