@@ -41,7 +41,7 @@
     "lint": "tslint ./src/**/*.ts ./test/**/*.ts ./examples/typescript/src/*.ts",
     "format": "tsfmt -r",
     "build": "npm run clean && tsc",
-    "publish": "npm run build && gulp publish-nodejsdriver"
+    "build-and-publish": "npm run build && gulp publish-nodejsdriver"
   },
   "repository": {
     "type": "git",
