@@ -20,8 +20,9 @@ function getSpawn(command, args, options) {
 }
 
 gulp.task('update-package-json', function (cb) {
-  fs.copyFileSync('package.json', 'dist' + path.sep + 'package.json');
-  fs.copyFileSync('README.md', 'dist' + path.sep + 'README.md');
+  process.chdir('dist');
+  fs.copyFileSync('..' + path.sep + 'package.json', 'package.json');
+  fs.copyFileSync('..' + path.sep + 'README.md', 'README.md');
   cb();
 });
 
