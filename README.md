@@ -32,10 +32,10 @@ For Node.js 8.x, 9.x, 10.x, 11.x use:
 }
 ```
 
-For Node.js 12.x and greater use:
+For Node.js 12.x:
 ```
 "dependencies": {
-  "teradata-nodejs-driver": "1.0.0-rc.3"
+  "teradata-nodejs-driver": "1.0.0-rc.5"
 }
 ```
 
@@ -67,7 +67,7 @@ Operating Systems:
 
 The MIT License
 
-Copyright (c) 2020 by Teradata. All rights reserved. http://teradata.com
+Copyright (c) 2021 by Teradata. All rights reserved. http://teradata.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
