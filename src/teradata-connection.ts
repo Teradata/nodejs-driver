@@ -47,18 +47,11 @@ export class TeradataConnection {
     this.logLevel = 0;
     this.logger = new TeradataLogging(this.logLevel);
 
-    // Setup libpath for ffi.library
-    let libpath: string = '';
-    if (process.platform === 'win32') {
-      libpath = 'node_modules/@teradataprebuilt/nativelib-win32/teradatasql.dll';
-    } else if (process.platform === 'darwin') {
-      libpath = 'node_modules/@teradataprebuilt/nativelib-darwin/teradatasql.dylib';
-    } else if (process.platform === 'freebsd' || process.platform === 'linux') {
-      libpath = 'node_modules/@teradataprebuilt/nativelib-linux/teradatasql.so';
-    }
+    // find @teradataprebuilt/nativelib-${process.platform} and remove index.js from the path
+    let pathToTeradataPrebuilt = require.resolve(`@teradataprebuilt/nativelib-${process.platform}`).slice(0,-9);
 
     // Load native library with libpath and declare functions
-    this.lib = ffi.Library(libpath,
+    this.lib = ffi.Library(`${pathToTeradataPrebuilt}/teradatasql`,
       {
         'jsgoCreateConnection': ['void', ['long', 'char*', 'char*', 'char**', this.ref.refType(this.ref.types.ulonglong)]],
         'jsgoCloseConnection': ['void', ['long', 'long', 'char**']],

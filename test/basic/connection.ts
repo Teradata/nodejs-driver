@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { TeradataConnection } from '../../src/teradata-connection';
 import { TeradataLogging } from '../../src/teradata-logging';
 import { connParams, badConnParams } from '../configurations';
+import { fail } from 'assert';
 
 const logger: TeradataLogging = new TeradataLogging();
 
@@ -11,10 +12,10 @@ describe('\n\n\nConnection Test', () => {
     try {
       const teradataConnection: TeradataConnection = new TeradataConnection();
       teradataConnection.connect(connParams);
+      done();
       } catch (error) {
         logger.errorLogMessage(error.message); // unexpected error
-      } finally {
-        done();
+        fail();
       }
   });
 });
@@ -24,9 +25,9 @@ describe('\n\n\nBad Connection Test', () => {
     try {
       const teradataConnection: TeradataConnection = new TeradataConnection();
       teradataConnection.connect(badConnParams);
+      fail();
     } catch (error) {
-      expect(error.message).contains('Failed to connect to foo');
-    } finally {
+      expect(error.message).contains('Hostname lookup failed for foo');
       done();
     }
   });
@@ -38,10 +39,10 @@ describe('Connects and Disconnects to Teradata Database', () => {
       const teradataConnection: TeradataConnection = new TeradataConnection();
       teradataConnection.connect(connParams);
       teradataConnection.close();
+      done();
     } catch (error) {
       logger.errorLogMessage(error.message); // unexpected error
-    } finally {
-      done();
+      fail();
     }
   });
 });
