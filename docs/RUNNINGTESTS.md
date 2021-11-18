@@ -19,6 +19,13 @@
     CREATE EXTERNAL PROCEDURE, CREATE FUNCTION, DROP FUNCTION
     ON TD01
     TO TD01;
+
+    -- if there is java installed on the client system
+    -- the test suite will attempt to test Java procedures
+    -- the following grants are required for the tests
+    GRANT EXECUTE PROCEDURE ON SQLJ.INSTALL_JAR TO td01;
+    GRANT EXECUTE PROCEDURE ON SQLJ.REPLACE_JAR TO td01;
+    GRANT EXECUTE PROCEDURE ON SQLJ.REMOVE_JAR TO td01;    
     ```
 1. Edit `test/configurations.ts` and modify the `'{ "host": "<hostname>", "user": "<username>", "password": "<password>" }'` with correct connection parameters.
 1. Run the Node.js Javascript test files:
