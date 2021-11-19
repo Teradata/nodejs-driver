@@ -37,6 +37,7 @@
   },
   "scripts": {
     "test": "rimraf src/node_modules && npm run build && mocha --bail --timeout 500000 -r ts-node/register test/**/*.ts",
+    "test-cop": "rimraf src/node_modules && npm run build && mocha --bail --timeout 500000 -r ts-node/register test/**/*.ts -g 'Connects to Teradata Database'",
     "clean": "rimraf dist",
     "lint": "tslint ./src/**/*.ts ./test/**/*.ts ./examples/typescript/src/*.ts",
     "format": "tsfmt -r",

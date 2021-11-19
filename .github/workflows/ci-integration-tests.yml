@@ -110,6 +110,11 @@ jobs:
           bteq < /tmp/install.bteq
       - name: Run tests on Mac
         run: npm run test
+      - name: Run tests for COP discovery
+        run: |
+          sudo echo "127.0.0.1       myhostcop1 myhostcop2 myhostcop3" >> /etc/hosts
+          sed -i 's/127.0.0.1/myhost/g' ./test/configurations.ts
+          npm run test
       - uses: actions/upload-artifact@v2
         if: ${{ failure() ||  cancelled() }}
         with:
