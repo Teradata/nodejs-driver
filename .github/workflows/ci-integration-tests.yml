@@ -131,7 +131,7 @@ jobs:
           EOF
 
           podman build . -t test
-          podman run --add-host myhostcop1:$IP--add-host myhostcop2:$IP --add-host myhostcop3:$IP test
+          podman run --add-host myhostcop1:$IP --add-host myhostcop2:$IP --add-host myhostcop3:$IP test
 
       - uses: actions/upload-artifact@v2
         if: ${{ failure() ||  cancelled() }}
