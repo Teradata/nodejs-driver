@@ -112,6 +112,10 @@ jobs:
         run: npm run test
       - name: Run tests for COP discovery
         run: |
+          brew install podman
+          podman machine init
+          podman machine start
+
           IP=$(ipconfig getifaddr en0)
           cat << EOF > Dockerfile
           FROM node:12
@@ -126,8 +130,8 @@ jobs:
           CMD ["npm", "run", "test-cop"]
           EOF
 
-          docker build . -t test
-          docker run --add-host myhostcop1:$IP--add-host myhostcop2:$IP --add-host myhostcop3:$IP test
+          podman build . -t test
+          podman run --add-host myhostcop1:$IP--add-host myhostcop2:$IP --add-host myhostcop3:$IP test
 
       - uses: actions/upload-artifact@v2
         if: ${{ failure() ||  cancelled() }}
