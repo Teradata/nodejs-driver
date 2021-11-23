@@ -1,6 +1,11 @@
 name: CI Integration Tests
 on:
   workflow_dispatch:
+    inputs:
+      runCOPTest:
+        description: 'Run COP test'
+        required: false
+        default: 'false'
 
 jobs:
   ciIntegrationTests:
@@ -111,6 +116,7 @@ jobs:
       - name: Run tests on Mac
         run: npm run test
       - name: Run tests for COP discovery
+        if: ${{ github.event.inputs && (github.event.inputs.runCOPTest == 'true') }}
         run: |
           brew install podman
           podman machine init
