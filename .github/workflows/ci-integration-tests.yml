@@ -9,7 +9,7 @@ on:
 
 jobs:
   ciIntegrationTests:
-    runs-on: macos-latest
+    runs-on: macos-10.15
     steps:
       - uses: actions/checkout@v2
       - name: Download Vantage Express
