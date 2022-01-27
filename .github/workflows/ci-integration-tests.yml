@@ -10,6 +10,10 @@ on:
 jobs:
   ciIntegrationTests:
     runs-on: macos-10.15
+    strategy:
+      matrix:
+        node: [ '12', '17.4' ]
+    name: Node ${{ matrix.node }} integration test
     steps:
       - uses: actions/checkout@v2
       - name: Download Vantage Express
@@ -48,7 +52,7 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version: ${{ matrix.node }}
           cache: npm
       - run: npm install
 
