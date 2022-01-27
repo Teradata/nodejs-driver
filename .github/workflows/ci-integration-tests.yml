@@ -118,7 +118,11 @@ jobs:
           EOF
           bteq < /tmp/install.bteq
       - name: Run tests on Mac
-        run: npm run test
+        run: |
+          # newer node.js versions have certain crypto disabled, e.g. 'DES/CBC/noPadding/64/HmacSHA1'
+          # we need to enable so that tests can pass
+          export NODE_OPTIONS=--openssl-legacy-provider
+          npm run test
       - name: Run tests for COP discovery
         if: ${{ github.event.inputs && (github.event.inputs.runCOPTest == 'true') }}
         run: |
