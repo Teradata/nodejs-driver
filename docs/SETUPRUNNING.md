@@ -1,8 +1,7 @@
 ## Setup
 
 ### NPM
-* Ensure you have **Node 12.x** (on a Mac use Homebrew and `brew install node@12.18.0`)
-* Ensure you have **npm 6.x** installed.
+* Ensure you have a supported version of Node installed (on a Mac use Homebrew and `brew install node@x.x.x` or `nvm install x.x.x`).
 * Add the dependency to your project. In the dependencies section of the package.json add:
 
 For Node.js 8.x, 9.x, 10.x, 11.x use:
@@ -14,7 +13,7 @@ For Node.js 8.x, 9.x, 10.x, 11.x use:
 ...
 ```
 
-For Node.js 12.x use:
+For Node.js 12.x, 17.x use:
 ```
 ...
 "dependencies": {

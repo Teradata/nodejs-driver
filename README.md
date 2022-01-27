@@ -25,6 +25,9 @@ Database API Specification v2.0: https://www.python.org/dev/peps/pep-0249/
 
 ## Supported Platforms
 
+> :information_source: Node.js versions 14 and 16 are not supported due to an issue in Node.js that affects `node-ffi-napi` library that this driver depends on: https://github.com/node-ffi-napi/ref-napi/issues/54. Never versions of Node.js no longer have the issue. 
+
+
 For Node.js 8.x, 9.x, 10.x, 11.x use:
 ```
 "dependencies": {
@@ -32,13 +35,12 @@ For Node.js 8.x, 9.x, 10.x, 11.x use:
 }
 ```
 
-For Node.js 12.x:
+For Node.js 12.x, 17.x:
 ```
 "dependencies": {
   "teradata-nodejs-driver": "1.0.0-rc.5"
 }
 ```
-
 
 Operating Systems:
 
@@ -67,7 +69,7 @@ Operating Systems:
 
 The MIT License
 
-Copyright (c) 2021 by Teradata. All rights reserved. http://teradata.com
+Copyright (c) 2022 by Teradata. All rights reserved. http://teradata.com
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

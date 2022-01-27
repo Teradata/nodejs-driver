@@ -119,7 +119,13 @@ jobs:
           bteq < /tmp/install.bteq
       - name: Run tests on Mac
         run: |
+          if [ "17" == "$NODE_VERSION" ]; then
+            echo "Setting NODE_OPTIONS for Node 17"
+            export NODE_OPTIONS=--openssl-legacy-provider
+          fi
           npm run test
+        env:
+          NODE_VERSION: ${{ matrix.node }}
       - name: Run tests for COP discovery
         if: ${{ github.event.inputs && (github.event.inputs.runCOPTest == 'true') }}
         run: |
