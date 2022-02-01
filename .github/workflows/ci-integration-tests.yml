@@ -10,6 +10,10 @@ on:
 jobs:
   ciIntegrationTests:
     runs-on: macos-10.15
+    strategy:
+      matrix:
+        node: [ '12', '17' ]
+    name: Node ${{ matrix.node }} integration test
     steps:
       - uses: actions/checkout@v2
       - name: Download Vantage Express
@@ -48,7 +52,7 @@ jobs:
 
       - uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version: ${{ matrix.node }}
           cache: npm
       - run: npm install
 
@@ -114,7 +118,14 @@ jobs:
           EOF
           bteq < /tmp/install.bteq
       - name: Run tests on Mac
-        run: npm run test
+        run: |
+          if [ "17" == "$NODE_VERSION" ]; then
+            echo "Setting NODE_OPTIONS for Node 17"
+            export NODE_OPTIONS=--openssl-legacy-provider
+          fi
+          npm run test
+        env:
+          NODE_VERSION: ${{ matrix.node }}
       - name: Run tests for COP discovery
         if: ${{ github.event.inputs && (github.event.inputs.runCOPTest == 'true') }}
         run: |
