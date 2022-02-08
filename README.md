@@ -25,7 +25,7 @@ Database API Specification v2.0: https://www.python.org/dev/peps/pep-0249/
 
 ## Supported Platforms
 
-> :information_source: Node.js versions 14 and 16 are not supported due to an issue in Node.js that affects `node-ffi-napi` library that this driver depends on: https://github.com/node-ffi-napi/ref-napi/issues/54. Never versions of Node.js no longer have the issue. 
+> :information_source: Node.js versions 14 and 16 are not supported. There is an issue in Node.js that affects `node-ffi-napi` library that this driver depends on: https://github.com/node-ffi-napi/ref-napi/issues/54. Newer versions of Node.js no longer have the issue. 
 
 
 For Node.js 8.x, 9.x, 10.x, 11.x use:
