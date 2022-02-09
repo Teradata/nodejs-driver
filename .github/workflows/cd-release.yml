@@ -21,6 +21,8 @@ jobs:
         shell: bash
         run: |
           export PATH=$PATH:./node_modules/.bin
+          git config --global user.email "developers@teradata.com"
+          git config --global user.name "Teradata GitHub Actions"
           bump $RELEASE_VERSION --commit --tag --push package.json package-lock.json docs/SETUPRUNNING.md README.md
         env:
           RELEASE_VERSION: ${{ github.event.inputs.releaseVersion }}
