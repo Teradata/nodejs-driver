@@ -24,6 +24,8 @@ jobs:
         env:
           RELEASE_VERSION: ${{ github.event.inputs.releaseVersion }}
       - run: npm run build-and-publish
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
