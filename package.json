@@ -1,6 +1,6 @@
 {
   "name": "teradata-nodejs-driver",
-  "version": "1.0.0-rc.6",
+  "version": "1.0.0-rc.5",
   "description": "Teradata Database Node.js Driver",
   "main": "teradata-connection.js",
   "directories": {
