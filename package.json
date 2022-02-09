@@ -37,9 +37,9 @@
     "@teradataprebuilt/nativelib-win32": "^1.0.0-beta.5"
   },
   "scripts": {
-    "test": "rimraf src/node_modules && npm run build && mocha --bail --timeout 500000 -r ts-node/register test/**/*.ts",
+    "test": "rimraf src/node_modules && npm run build && mocha --bail --timeout 900000 -r ts-node/register test/**/*.ts",
     "test-cop:about": "test-cop script requires the following entry in /etc/hosts: 127.0.0.1       myhostcop1 myhostcop2 myhostcop3. It also requires that the config is modified: sed -i 's/127.0.0.1/myhost/g' ./test/configurations.ts .    # The GH Actions CI worfklow automates these steps",
-    "test-cop": "rimraf src/node_modules && npm run build && mocha --bail --timeout 500000 -r ts-node/register test/**/*.ts -g 'Connects to Teradata Database'",
+    "test-cop": "rimraf src/node_modules && npm run build && mocha --bail --timeout 900000 -r ts-node/register test/**/*.ts -g 'Connects to Teradata Database'",
     "clean": "rimraf dist",
     "lint": "tslint ./src/**/*.ts ./test/**/*.ts ./examples/typescript/src/*.ts",
     "format": "tsfmt -r",
