@@ -33,12 +33,4 @@ gulp.task('npm-publish', function (cb) {
   });
 });
 
-gulp.task('npm-logout', function (cb) {
-  var cmd = getSpawn('npm', ['logout']);
-  cmd.on('close', function (code) {
-    console.log('Published Node.js Teradata Driver successfully.');
-    cb(code);
-  });
-});
-
-gulp.task('publish-nodejsdriver', gulp.series('update-package-json', 'npm-publish', 'npm-logout'));
+gulp.task('publish-nodejsdriver', gulp.series('update-package-json', 'npm-publish'));
