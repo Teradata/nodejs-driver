@@ -32,9 +32,9 @@
     "typescript-formatter": "^7.2.2"
   },
   "optionalDependencies": {
-    "@teradataprebuilt/nativelib-darwin": "1.0.0-beta.9",
-    "@teradataprebuilt/nativelib-linux": "1.0.0-beta.9",
-    "@teradataprebuilt/nativelib-win32": "1.0.0-beta.9"
+    "@teradataprebuilt/nativelib-darwin": "1.0.0-beta.10",
+    "@teradataprebuilt/nativelib-linux": "1.0.0-beta.10",
+    "@teradataprebuilt/nativelib-win32": "1.0.0-beta.10"
   },
   "scripts": {
     "test": "rimraf src/node_modules && npm run build && mocha --bail --timeout 900000 -r ts-node/register test/**/*.ts",
