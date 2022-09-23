@@ -9,9 +9,9 @@
   },
   "dependencies": {
     "@jsdevtools/version-bump-prompt": "^6.1.0",
-    "ffi-napi": "^3.0.1",
-    "ref-array-di": "^1.2.1",
-    "ref-napi": "^2.0.2",
+    "ffi-napi": "^4.0.3",
+    "ref-array-di": "^1.2.2",
+    "ref-napi": "^3.0.3",
     "run-script-os": "^1.0.3"
   },
   "devDependencies": {
@@ -32,9 +32,9 @@
     "typescript-formatter": "^7.2.2"
   },
   "optionalDependencies": {
-    "@teradataprebuilt/nativelib-darwin": "1.0.0-beta.11",
-    "@teradataprebuilt/nativelib-linux": "1.0.0-beta.11",
-    "@teradataprebuilt/nativelib-win32": "1.0.0-beta.11"
+    "@teradataprebuilt/nativelib-darwin": "1.0.0-beta.12",
+    "@teradataprebuilt/nativelib-linux": "1.0.0-beta.12",
+    "@teradataprebuilt/nativelib-win32": "1.0.0-beta.12"
   },
   "scripts": {
     "test": "rimraf src/node_modules && npm run build && mocha --bail --timeout 900000 -r ts-node/register test/**/*.ts",
