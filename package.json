@@ -22,7 +22,7 @@
     "glob": "^7.1.6",
     "gulp": "4.0.2",
     "gulp-hub": "4.2.0",
-    "mocha": "^7.2.0",
+    "mocha": "^10.2.0",
     "require-dir": "1.2.0",
     "rimraf": "3.0.2",
     "run-sequence": "^2.2.1",
