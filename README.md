@@ -2,11 +2,9 @@
 
 This package enables Node.js applications to connect to the Teradata Database.
 
-This package closely implements the [PEP-249 Python Database API Specification 2.0](https://www.python.org/dev/peps/pep-0249/).
+This package requires 64-bit Node.js 12 or later, and runs on Windows, macOS, and Linux. 32-bit Node.js is not supported.
 
-This package requires Node.js 12.x or later, and runs on Windows, macOS, and Linux. 32-bit Node.js is not supported.
-
-> :information_source: Please note Node.js versions 14 and 16 are not currently supported for Linux and macOS. There is an issue in Node.js that affects `node-ffi-napi` library that the driver depends on: [node-ffi-napi/ref-napi#54](https://github.com/node-ffi-napi/ref-napi/issues/54). Newer versions of Node.js fixed the issue.
+> Please note that Node.js versions 14 and 16 are not currently supported for Linux and macOS. An issue ([ref-napi#54](https://github.com/node-ffi-napi/ref-napi/issues/54)) in Node.js versions 14 and 16 affects the `node-ffi-napi` library that the driver depends on. This issue is fixed in later versions of Node.js.
 
 For community support, please visit [Teradata Community](https://support.teradata.com/community).
 
@@ -37,7 +35,6 @@ Copyright 2023 Teradata. All Rights Reserved.
 * [Undefined Values](#UndefinedValues)
 * [Character Export Width](#CharacterExportWidth)
 * [Module Constructors](#ModuleConstructors)
-* [Module Globals](#ModuleGlobals)
 * [Module Exceptions](#ModuleExceptions)
 * [Connection Attributes](#ConnectionAttributes)
 * [Connection Methods](#ConnectionMethods)
@@ -55,13 +52,9 @@ Copyright 2023 Teradata. All Rights Reserved.
 
 ### Features
 
-The *Teradata SQL Driver for Node.js* is a DBAPI Driver that enables Node.js applications to connect to the Teradata Database. The driver closely implements the [PEP-249 Python Database API Specification 2.0](https://www.python.org/dev/peps/pep-0249/).
-
-The driver is a young product that offers a basic feature set. We are working diligently to add features to the driver, and our goal is feature parity with the Teradata JDBC Driver.
-
 At the present time, the driver offers the following features.
 
-* Supported for use with Teradata Database 16.10 and later releases.
+* Supported for use with Teradata Database 16.20 and later releases.
 * COP Discovery.
 * Laddered Concurrent Connect.
 * HTTPS/TLS connections with Teradata SQL Engine 16.20.53.30 and later.
@@ -94,11 +87,9 @@ At the present time, the driver offers the following features.
 
 ### Installation
 
-The driver depends on the `ffi-napi`, `ref-napi`, `ref-array-di` packages which is available from [npmjs.com](http://www.npmjs.com).
+The driver depends on the `ffi-napi`, `ref-napi`, `ref-array-di` packages which are available from [npmjs.com](http://www.npmjs.com).
 
 Use `npm install teradatasql` to download and install the driver and its dependencies automatically.
-
-When upgrading to a new version of the driver, you may need to use pip install's `--force` option to force the download of the new version.
 
 <a id="License"></a>
 
@@ -126,38 +117,38 @@ Sample programs are provided to demonstrate how to use the driver. When the driv
 
 The sample programs are coded with a fake database hostname `whomooz`, username `guest`, and password `please`. Substitute your actual database hostname and credentials before running a sample program.
 
-Program                                                                                                                           | Purpose
---------------------------------------------------------------------------------------------------------------------------------- | ---
-[AGKRBatchInsert.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/AGKRBatchInsert.ts)              | Demonstrates how to insert a batch of rows with Auto-Generated Key Retrieval (AGKR)
-[AGKRInsertSelect.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/AGKRInsertSelect.ts)            | Demonstrates Insert/Select with Auto-Generated Key Retrieval (AGKR)
-[BatchInsert.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/BatchInsert.ts)                      | Demonstrates how to insert a batch of rows
-[BatchInsertCSV.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/BatchInsertCSV.ts)                | Demonstrates how to insert a batch of rows from a CSV file
-[BatchInsPerf.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/BatchInsPerf.ts)                    | Measures time to insert one million rows
-[CharPadding.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/CharPadding.ts)                      | Demonstrates the database's *Character Export Width* behavior
-[CommitRollback.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/CommitRollback.ts)                | Demonstrates commit and rollback methods with auto-commit off.
-[DecimalDigits.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/DecimalDigits.ts)                  | Demonstrates how to format decimal.Decimal values.
-[DriverDatabaseVersion.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/DriverDatabaseVersion.ts)  | Displays the driver version and database version
-[ElicitFile.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/ElicitFile.ts)                        | Demonstrates C source file upload to create a User-Defined Function (UDF)
-[ExportCSVResult.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/ExportCSVResult.ts)              | Demonstrates how to export a query result set to a CSV file
-[ExportCSVResults.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/ExportCSVResults.ts)            | Demonstrates how to export multiple query result sets to CSV files
-[FakeExportCSVResults.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/FakeExportCSVResults.ts)    | Demonstrates how to export multiple query result sets with the metadata to CSV files
-[FakeResultSetCon.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/FakeResultSetCon.ts)            | Demonstrates connection parameter for fake result sets
-[FakeResultSetEsc.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/FakeResultSetEsc.ts)            | Demonstrates escape function for fake result sets
-[FastExportCSV.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/FastExportCSV.ts)                  | Demonstrates how to FastExport rows from a table to a CSV file
-[FastExportTable.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/FastExportTable.ts)              | Demonstrates how to FastExport rows from a table
-[FastLoadBatch.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/FastLoadBatch.ts)                  | Demonstrates how to FastLoad batches of rows
-[FastLoadCSV.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/FastLoadCSV.ts)                      | Demonstrates how to FastLoad batches of rows from a CSV file
-[HelpSession.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/HelpSession.ts)                      | Displays session information
-[IgnoreErrors.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/IgnoreErrors.ts)                    | Demonstrates how to ignore errors
-[InsertLob.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/InsertLob.ts)                          | Demonstrates how to insert BLOB and CLOB values
-[InsertXML.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/InsertXML.ts)                          | Demonstrates how to insert and retrieve XML values
-[LoadCSVFile.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/LoadCSVFile.ts)                      | Demonstrates how to load data from a CSV file into a table
-[LobLocators.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/LobLocators.ts)                      | Demonstrates how to use LOB locators
-[MetadataFromPrepare.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/MetadataFromPrepare.ts)      | Demonstrates how to prepare a SQL request and obtain SQL statement metadata
-[ParamDataTypes.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/ParamDataTypes.ts)                | Demonstrates how to specify data types for parameter marker bind values
-[ShowCommand.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/ShowCommand.ts)                      | Displays the results from the `SHOW` command
-[StoredProc.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/StoredProc.ts)                        | Demonstrates how to create and call a SQL stored procedure
-[TJEncryptPassword.ts](https://github.td.teradata.com/gosql/gosql/tree/master/nodejsdriver/samples/TJEncryptPassword.ts)          | Creates encrypted password files
+Program                                                                                                              | Purpose
+-------------------------------------------------------------------------------------------------------------------- | ---
+[AGKRBatchInsert.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/AGKRBatchInsert.ts)              | Demonstrates how to insert a batch of rows with Auto-Generated Key Retrieval (AGKR)
+[AGKRInsertSelect.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/AGKRInsertSelect.ts)            | Demonstrates Insert/Select with Auto-Generated Key Retrieval (AGKR)
+[BatchInsert.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/BatchInsert.ts)                      | Demonstrates how to insert a batch of rows
+[BatchInsertCSV.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/BatchInsertCSV.ts)                | Demonstrates how to insert a batch of rows from a CSV file
+[BatchInsPerf.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/BatchInsPerf.ts)                    | Measures time to insert one million rows
+[CharPadding.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/CharPadding.ts)                      | Demonstrates the database's *Character Export Width* behavior
+[CommitRollback.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/CommitRollback.ts)                | Demonstrates commit and rollback methods with auto-commit off.
+[DecimalDigits.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/DecimalDigits.ts)                  | Demonstrates how to format decimal.Decimal values.
+[DriverDatabaseVersion.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/DriverDatabaseVersion.ts)  | Displays the driver version and database version
+[ElicitFile.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/ElicitFile.ts)                        | Demonstrates C source file upload to create a User-Defined Function (UDF)
+[ExportCSVResult.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/ExportCSVResult.ts)              | Demonstrates how to export a query result set to a CSV file
+[ExportCSVResults.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/ExportCSVResults.ts)            | Demonstrates how to export multiple query result sets to CSV files
+[FakeExportCSVResults.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/FakeExportCSVResults.ts)    | Demonstrates how to export multiple query result sets with the metadata to CSV files
+[FakeResultSetCon.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/FakeResultSetCon.ts)            | Demonstrates connection parameter for fake result sets
+[FakeResultSetEsc.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/FakeResultSetEsc.ts)            | Demonstrates escape function for fake result sets
+[FastExportCSV.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/FastExportCSV.ts)                  | Demonstrates how to FastExport rows from a table to a CSV file
+[FastExportTable.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/FastExportTable.ts)              | Demonstrates how to FastExport rows from a table
+[FastLoadBatch.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/FastLoadBatch.ts)                  | Demonstrates how to FastLoad batches of rows
+[FastLoadCSV.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/FastLoadCSV.ts)                      | Demonstrates how to FastLoad batches of rows from a CSV file
+[HelpSession.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/HelpSession.ts)                      | Displays session information
+[IgnoreErrors.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/IgnoreErrors.ts)                    | Demonstrates how to ignore errors
+[InsertLob.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/InsertLob.ts)                          | Demonstrates how to insert BLOB and CLOB values
+[InsertXML.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/InsertXML.ts)                          | Demonstrates how to insert and retrieve XML values
+[LoadCSVFile.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/LoadCSVFile.ts)                      | Demonstrates how to load data from a CSV file into a table
+[LobLocators.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/LobLocators.ts)                      | Demonstrates how to use LOB locators
+[MetadataFromPrepare.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/MetadataFromPrepare.ts)      | Demonstrates how to prepare a SQL request and obtain SQL statement metadata
+[ParamDataTypes.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/ParamDataTypes.ts)                | Demonstrates how to specify data types for parameter marker bind values
+[ShowCommand.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/ShowCommand.ts)                      | Displays the results from the `SHOW` command
+[StoredProc.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/StoredProc.ts)                        | Demonstrates how to create and call a SQL stored procedure
+[TJEncryptPassword.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/TJEncryptPassword.ts)          | Creates encrypted password files
 
 <a id="Using"></a>
 
@@ -178,15 +169,16 @@ You may specify connection parameters as a JavaScript object, as a JSON string, 
 
 Connection parameters specified only as a JavaScript object:
 
-con = teradataConnection.connect({host:"whomooz",user:"guest",password:"please"})
+    con = teradataConnection.connect({host:"whomooz",user:"guest",password:"please"})
 
 Connection parameters specified as a JSON string:
 
-con = teradataConnection.connect({}, '{"host":"whomooz", "user":"guest", "password":"please"}')
+    con = teradataConnection.connect({}, '{"host":"whomooz", "user":"guest", "password":"please"}')
 
 Connection parameters specified using a combination:
 
-con = teradataConnection.connect({host:"whomooz"}, '{"user":"guest", "password":"please"}')
+    con = teradataConnection.connect({host:"whomooz"}, '{"user":"guest", "password":"please"}')
+
 When a combination of parameters are specified, connection parameters specified as a JSON string take precedence over same-named connection parameters specified in the JavaScript object.
 
 <a id="ConnectionParameters"></a>
@@ -686,13 +678,13 @@ Bind-value JavaScript data type   | Teradata Database data type
 --------------------------------- | ---
 `Boolean`                         |  Not supported
 `BigInt`                          | `BIGINT`
-`Date`                            | `TIMESTAMP(3)`**
+`Date`                            | `TIMESTAMP(3)`
 `Number`                          | `FLOAT`
 `String`                          | `VARCHAR`
 `Symbol`                          |  Not supported
 `Uint8Array`                      | `VARBYTE`
 
-\*\* The Teradata SQL Driver for Node.js transmits the UTC time of the JavaScript Date object to the server as the `TIMESTAMP(3)` value.
+The Teradata SQL Driver for Node.js transmits the UTC time of the JavaScript Date object to the server as the `TIMESTAMP(3)` value.
 
 Transforms are used for SQL `ARRAY` data values, and they can be transferred to and from the database as `VARCHAR` values.
 
@@ -794,24 +786,6 @@ Creates and returns a `Date` value.
 Creates and returns a `Date` value corresponding to the specified number of seconds after 1970-01-01 00:00:00.
 
 <a id="ModuleGlobals"></a>
-
-### Module Globals
-
-`teradatasql.apilevel`
-
-String constant `"2.0"` indicating that the driver closely implements the [PEP-249 Python Database API Specification 2.0](https://www.python.org/dev/peps/pep-0249/).
-
----
-
-`teradatasql.threadsafety`
-
-Integer constant `2` indicating that threads may share this module, and threads may share connections, but threads must not share cursors.
-
----
-
-`teradatasql.paramstyle`
-
-String constant `"qmark"` indicating that prepared SQL requests use question-mark parameter markers.
 
 <a id="ModuleExceptions"></a>
 
@@ -1442,6 +1416,9 @@ Limitations when exporting to CSV files:
 <a id="ChangeLog"></a>
 
 ### Change Log
+
+`20.0.1` - November 14, 2023
+* Correct links for sample programs
 
 `20.0.0` - November 8, 2023
 * Initial release
