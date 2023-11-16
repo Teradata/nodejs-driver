@@ -1417,6 +1417,9 @@ Limitations when exporting to CSV files:
 
 ### Change Log
 
+`20.0.2` - November 16, 2023
+* Build DLL and shared library with Go 1.20.11
+
 `20.0.1` - November 14, 2023
 * Correct links for sample programs
 
