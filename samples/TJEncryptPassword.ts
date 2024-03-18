@@ -85,12 +85,12 @@
 //
 //              The following example commands illustrate using a 256-bit AES key, and using the HmacSHA256 algorithm.
 //
-//                node dist/encrypt-password.js AES/CBC/NoPadding 256 HmacSHA256 PassKey.properties EncPass.properties whomooz guest please
+//                node TJEncryptPassword.js AES/CBC/NoPadding 256 HmacSHA256 PassKey.properties EncPass.properties whomooz guest please
 //
 //              Password Encryption Key File Format
 //              -----------------------------------
 //
-//              You are not required to use the encrypt-password program to create the files containing the password encryption key and
+//              You are not required to use the TJEncryptPassword program to create the files containing the password encryption key and
 //              encrypted password. You can develop your own software to create the necessary files, but the files must match the format
 //              expected by the Teradata SQL Driver for Node.js.
 //
@@ -185,22 +185,10 @@
 //              ---------------------------------
 //
 //              A transformation is a string that describes the set of operations to be performed on the given input, to produce transformed output.
-//              A transformation specifies the name of a cryptographic algorithm such as DES or AES, followed by a feedback mode and padding scheme.
+//              A transformation specifies the name of a cryptographic algorithm such as AES, followed by a feedback mode and padding scheme.
 //
 //              The Teradata SQL Driver for Node.js supports the following transformations and key sizes.
 //
-//                 DES/CBC/NoPadding          64
-//                 DES/CBC/PKCS5Padding       64
-//                 DES/CFB/NoPadding          64
-//                 DES/CFB/PKCS5Padding       64
-//                 DES/OFB/NoPadding          64
-//                 DES/OFB/PKCS5Padding       64
-//                 DESede/CBC/NoPadding       192
-//                 DESede/CBC/PKCS5Padding    192
-//                 DESede/CFB/NoPadding       192
-//                 DESede/CFB/PKCS5Padding    192
-//                 DESede/OFB/NoPadding       192
-//                 DESede/OFB/PKCS5Padding    192
 //                 AES/CBC/NoPadding          128
 //                 AES/CBC/NoPadding          192
 //                 AES/CBC/NoPadding          256
@@ -220,7 +208,7 @@
 //                 AES/OFB/PKCS5Padding       192
 //                 AES/OFB/PKCS5Padding       256
 //
-//              Stored Password Protection uses a symmetric encryption algorithm such as DES or AES, in which the same secret key is used for
+//              Stored Password Protection uses a symmetric encryption algorithm such as AES, in which the same secret key is used for
 //              encryption and decryption of the password. Stored Password Protection does not use an asymmetric encryption algorithm such as RSA,
 //              with separate public and private keys.
 //
@@ -244,8 +232,6 @@
 //              The strength of the encryption depends on your choice of cipher algorithm and key size.
 //
 //              AES uses a 128-bit (16 byte), 192-bit (24 byte), or 256-bit (32 byte) key.
-//              DESede uses a 192-bit (24 byte) key. The The Teradata SQL Driver for Node.js does not support a 128-bit (16 byte) key for DESede.
-//              DES uses a 64-bit (8 byte) key.
 //
 //              Sharing Files with the Teradata JDBC Driver
 //              -------------------------------------------
@@ -293,11 +279,7 @@ type Row = any[] | null;
 
 function convertJavaNames(sName: string, nKeySizeInBits: number = 0, sMode: string = ""): string {
     // for list of available cypher names in node.js run command: openssl list -cipher-algorithms
-    if (sName === "DES") {
-        sName = "des-" + sMode.toLowerCase(); // e.g., 'des-cbc'
-    } else if (sName === "DESede") {
-        sName = "des-ede3-" + sMode.toLowerCase(); // e.g., 'des-ede3-cbc'
-    } else if (sName === "AES") {
+    if (sName === "AES") {
         sName = "aes-" + nKeySizeInBits.toString() + "-" + sMode.toLowerCase(); // e.g., 'aes-128-ofb'
     }
     return sName;
@@ -569,7 +551,7 @@ const sAlgorithm: string = asTransformationParts[0];
 const sMode: string = asTransformationParts[1];
 const sPadding: string = asTransformationParts[2];
 
-if (["DES", "DESede", "AES"].indexOf(sAlgorithm) < 0) {
+if ("AES".indexOf(sAlgorithm) < 0) {
     console.log("Unknown algorithm " + sAlgorithm);
     process.exit(1);
 }
