@@ -1410,6 +1410,12 @@ Limitations when exporting to CSV files:
 
 ### Change Log
 
+`20.0.10` - April 10, 2024
+* GOSQL-185 Use FIPS-140 Compliant Modules
+* Build DLL and shared library with Go 1.20.14
+* Build DLL and shared library with Microsoft Go for Windows, Linux Intel, Linux ARM
+* Build shared library with golang-fips for macOS Intel, macOS ARM
+
 `20.0.8` - March 18, 2024
 * GOSQL-121 Linux ARM support
 * GOSQL-184 remove DES and DESede
