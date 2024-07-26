@@ -46,6 +46,10 @@ try {
 						sType = oValue.constructor.name
 					}
 
+					if (sType === "Date") {
+						oValue = "toISOString: " + oValue.toISOString () + " toString: " + oValue.toString ()
+					}
+
 					if (sType === "Uint8Array") {
 						oValue = Buffer.from (oValue).toString ("hex")
 					}
