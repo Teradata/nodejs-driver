@@ -128,6 +128,7 @@ Program                                                                         
 [BatchInsert.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/BatchInsert.ts)                      | Demonstrates how to insert a batch of rows
 [BatchInsertCSV.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/BatchInsertCSV.ts)                | Demonstrates how to insert a batch of rows from a CSV file
 [BatchInsPerf.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/BatchInsPerf.ts)                    | Measures time to insert one million rows
+[CancelSleep.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/CancelSleep.ts)                      | Demonstrates how to use the cancel method to interrupt a query
 [CharPadding.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/CharPadding.ts)                      | Demonstrates the database's *Character Export Width* behavior
 [CommitRollback.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/CommitRollback.ts)                | Demonstrates commit and rollback methods with auto-commit off.
 [DecimalDigits.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/DecimalDigits.ts)                  | Demonstrates how to format decimal.Decimal values.
@@ -837,6 +838,14 @@ Read/write `boolean` attribute for the connection's auto-commit setting. Default
 
 ### Connection Methods
 
+`.cancel()`
+
+Attempts to cancel the currently executing SQL request, if one is currently executing. Does nothing if called when no SQL request is executing
+
+Only the SQL request executed by the `.executeAsync()` method or the `.executemanyAsync()` method can be cancelled.
+
+---
+
 `.close()`
 
 Closes the Connection.
@@ -920,9 +929,25 @@ If a sequence of parameter values is provided as the second argument, the values
 
 ---
 
+`.executeAsync(` *SQLRequest* `,` *OptionalSequenceOfParameterValues* `, ignoreErrors=` *OptionalSequenceOfIgnoredErrorCodes* `)`
+
+Asynchronously executes the SQL request. Returns a `Promise`.
+If a sequence of parameter values is provided as the second argument, the values will be bound to question-mark parameter markers in the SQL request. Specifying parameter values as a mapping is not supported.
+
+---
+
 `.executemany(` *SQLRequest* `,` *SequenceOfSequencesOfParameterValues* `, ignoreErrors=` *OptionalSequenceOfIgnoredErrorCodes* `)`
 
 Executes the SQL request as an iterated SQL request for the batch of parameter values.
+The batch of parameter values must be specified as a sequence of sequences. Specifying parameter values as a mapping is not supported.
+
+The `ignoreErrors` parameter is optional. The ignored error codes must be specified as a sequence of integers.
+
+---
+
+`.executemanyAsync(` *SQLRequest* `,` *SequenceOfSequencesOfParameterValues* `, ignoreErrors=` *OptionalSequenceOfIgnoredErrorCodes* `)`
+
+Asynchronously executes the SQL request as an iterated SQL request for the batch of parameter values. Returns a `Promise`.
 The batch of parameter values must be specified as a sequence of sequences. Specifying parameter values as a mapping is not supported.
 
 The `ignoreErrors` parameter is optional. The ignored error codes must be specified as a sequence of integers.
@@ -1442,6 +1467,9 @@ Limitations when exporting to CSV files:
 <a id="ChangeLog"></a>
 
 ### Change Log
+`20.0.16` - September 27, 2024
+* GOSQL-177 asynchronous request support
+* GOSQL-178 Go TeraGSS logmech=TD2 bypass DHKE for HTTPS connections
 
 `20.0.15` - July 31, 2024
 * GOSQL-205 Stored Password Protection for http(s)_proxy_password connection parameters
