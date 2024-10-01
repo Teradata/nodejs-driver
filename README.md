@@ -1467,6 +1467,12 @@ Limitations when exporting to CSV files:
 <a id="ChangeLog"></a>
 
 ### Change Log
+
+`20.0.17` - October 1, 2024
+* GOSQL-196 Go TeraGSS logmech=JWT bypass DHKE for HTTPS connections
+* GOSQL-210 provide Server Name Indication (SNI) field in the TLS client hello
+* Build macOS shared library with golang-fips go1.22.5-3-openssl-fips
+
 `20.0.16` - September 27, 2024
 * GOSQL-177 asynchronous request support
 * GOSQL-178 Go TeraGSS logmech=TD2 bypass DHKE for HTTPS connections
