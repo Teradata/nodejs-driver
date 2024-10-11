@@ -515,6 +515,8 @@ Client Attribute            | Source   | Description
 `ClientTcpPortNumber`       | database | The connection's client TCP port number, as determined by the database
 `ClientIPAddrByClient`      | driver   | The client IP address, as determined by the driver
 `ClientPortByClient`        | driver   | The connection's client TCP port number, as determined by the driver
+`ClientInterfaceKind`       | driver   | The value `S` to indicate Node.js, available beginning with Teradata Database 17.20.03.19
+`ClientInterfaceVersion`    | driver   | The driver version, available beginning with Teradata Database 17.20.03.19
 `ClientProgramName`         | driver   | The client program name, followed by a streamlined call stack
 `ClientSystemUserId`        | driver   | The client user name
 `ClientOsName`              | driver   | The client operating system name
@@ -1211,6 +1213,7 @@ Connection function escape clauses are replaced by the returned information befo
 Connection Function                           | Returns
 --------------------------------------------- | ---
 `{fn teradata_amp_count}`                     | Number of AMPs of the database system
+`{fn teradata_connected}`                     | `true` or `false` indicating whether this connection has logged on
 `{fn teradata_database_version}`              | Version number of the database
 `{fn teradata_driver_version}`                | Version number of the driver
 `{fn teradata_get_errors}`                    | Errors from the most recent batch operation
@@ -1467,6 +1470,10 @@ Limitations when exporting to CSV files:
 <a id="ChangeLog"></a>
 
 ### Change Log
+
+`20.0.19` - October 11, 2024
+* GOSQL-211 enable logon to database without DHKE bypass after logon to database having DHKE bypass
+* Add escape function `{fn teradata_connected}`
 
 `20.0.18` - October 7, 2024
 * Omit port suffix from HTTP Host: header when using default port 80 for HTTP or 443 for HTTPS
