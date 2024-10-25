@@ -24,7 +24,7 @@ let sRequest: string = "DROP TABLE " + sTableName;
 try {
     console.log(sRequest);
     cur.execute(sRequest);
-} catch (ex) {
+} catch (ex: any) {
     if (ex instanceof OperationalError) {
         console.log("Ignoring", ex.message.split("\n")[0]);
     } else {

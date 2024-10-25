@@ -16,7 +16,7 @@ console.log("Demonstrating how to ignore caught exceptions:");
 console.log("drop user NonExistentUser");
 try {
     cur.execute("drop user NonExistentUser");
-} catch (ex) {
+} catch (ex: any) {
     if (ex instanceof OperationalError && ex.message.includes("[Error 3802]")) {
         console.log("Ignoring", ex.message.split("\n")[0]);
     } else {
@@ -27,7 +27,7 @@ try {
 console.log("drop view NonExistentView");
 try {
     cur.execute("drop view NonExistentView");
-} catch (ex) {
+} catch (ex: any) {
     if (ex instanceof OperationalError && ex.message.includes("[Error 3807]")) {
         console.log("Ignoring", ex.message.split("\n")[0]);
     } else {
@@ -38,7 +38,7 @@ try {
 console.log("drop macro NonExistentMacro");
 try {
     cur.execute("drop macro NonExistentMacro");
-} catch (ex) {
+} catch (ex: any) {
     if (ex instanceof OperationalError && ex.message.includes("[Error 3824]")) {
         console.log("Ignoring", ex.message.split("\n")[0]);
     } else {
@@ -49,7 +49,7 @@ try {
 console.log("drop table NonExistentTable");
 try {
     cur.execute("drop table NonExistentTable");
-} catch (ex) {
+} catch (ex: any) {
     if (ex instanceof OperationalError && ex.message.includes("[Error 3807]")) {
         console.log("Ignoring", ex.message.split("\n")[0]);
     } else {
@@ -60,7 +60,7 @@ try {
 console.log("drop database NonExistentDbase");
 try {
     cur.execute("drop database NonExistentDbase");
-} catch (ex) {
+} catch (ex: any) {
     if (ex instanceof OperationalError && ex.message.includes("[Error 3802]")) {
         console.log("Ignoring", ex.message.split("\n")[0]);
     } else {
@@ -71,7 +71,7 @@ try {
 console.log("drop procedure NonExistentProc");
 try {
     cur.execute("drop procedure NonExistentProc");
-} catch (ex) {
+} catch (ex: any) {
     if (ex instanceof OperationalError && ex.message.includes("[Error 5495]")) {
         console.log("Ignoring", ex.message.split("\n")[0]);
     } else {

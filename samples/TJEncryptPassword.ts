@@ -621,7 +621,7 @@ try {
     console.log(row);
     cur.close();
     con.close();
-} catch (error) {
+} catch (error: any) {
     if (error instanceof OperationalError) {
         console.log(error.message);
     } else {

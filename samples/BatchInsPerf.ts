@@ -19,7 +19,7 @@ const nBatchCount: number = 100;
 
 try {
     cur.execute("drop table " + sTableName);
-} catch (ex) {
+} catch (ex: any) {
     if (ex instanceof OperationalError) {
         console.log("Ignoring", ex.message.split("\n")[0]);
     } else {
