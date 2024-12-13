@@ -3,7 +3,7 @@
 // This sample program demonstrates how to execute a SQL request and display results.
 
 // @ts-ignore
-import { TeradataConnection, TeradataCursor } from "teradatasql"
+import * as teradatasql from "teradatasql"
 
 if (process.argv.length != 6) {
 	console.log ("Parameters: Host User Password SQL")
@@ -18,11 +18,9 @@ const sSQL      : string = process.argv [5]
 type Rows = any []
 type Row  = any [] | null
 
-let con: TeradataConnection = new TeradataConnection ()
+let con: teradatasql.TeradataConnection = teradatasql.connect ({ host: sHost, user: sUser, password: sPassword })
 try {
-	con.connect ({ host: sHost, user: sUser, password: sPassword })
-
-	let cur: TeradataCursor = con.cursor ()
+	let cur: teradatasql.TeradataCursor = con.cursor ()
 	try {
 		console.log (`Executing ${sSQL}`)
 		cur.execute (sSQL)

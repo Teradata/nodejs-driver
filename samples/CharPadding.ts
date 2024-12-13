@@ -10,38 +10,39 @@
 // data types to VARCHAR.
 
 // @ts-ignore
-import { TeradataConnection, TeradataCursor } from "teradatasql";
+import * as teradatasql from "teradatasql";
 
-const con: TeradataConnection = new TeradataConnection();
-
-con.connect({ host: "whomooz", user: "guest", password: "please" });
-
-const cur: TeradataCursor = con.cursor();
-
-cur.execute("CREATE TABLE MyTable (c1 CHAR(10), c2 CHAR(10))");
-
+const con: teradatasql.TeradataConnection = teradatasql.connect({ host: "whomooz", user: "guest", password: "please" });
 try {
-    cur.execute("INSERT INTO MyTable VALUES ('a', 'b')");
+	const cur: teradatasql.TeradataCursor = con.cursor();
+	try {
+		cur.execute("CREATE TABLE MyTable (c1 CHAR(10), c2 CHAR(10))");
 
-    console.log("Original query that produces trailing space padding:");
-    cur.execute("SELECT c1, c2 FROM MyTable");
-    console.log(cur.fetchall());
+		try {
+			cur.execute("INSERT INTO MyTable VALUES ('a', 'b')");
 
-    console.log("Modified query with either CAST or TRIM to avoid trailing space padding:");
-    cur.execute("SELECT CAST(c1 AS VARCHAR(10)), TRIM(TRAILING FROM c2) FROM MyTable");
-    console.log(cur.fetchall());
+			console.log("Original query that produces trailing space padding:");
+			cur.execute("SELECT c1, c2 FROM MyTable");
+			console.log(cur.fetchall());
 
-    cur.execute("CREATE VIEW MyView (c1, c2) AS SELECT CAST(c1 AS VARCHAR(10)), TRIM(TRAILING FROM c2) FROM MyTable");
-    try {
-        console.log("Or query view with CAST or TRIM to avoid trailing space padding:");
-        cur.execute("SELECT c1, c2 FROM MyView");
-        console.log(cur.fetchall());
-    } finally {
-        cur.execute("DROP VIEW MyView");
-    }
+			console.log("Modified query with either CAST or TRIM to avoid trailing space padding:");
+			cur.execute("SELECT CAST(c1 AS VARCHAR(10)), TRIM(TRAILING FROM c2) FROM MyTable");
+			console.log(cur.fetchall());
+
+			cur.execute("CREATE VIEW MyView (c1, c2) AS SELECT CAST(c1 AS VARCHAR(10)), TRIM(TRAILING FROM c2) FROM MyTable");
+			try {
+				console.log("Or query view with CAST or TRIM to avoid trailing space padding:");
+				cur.execute("SELECT c1, c2 FROM MyView");
+				console.log(cur.fetchall());
+			} finally {
+				cur.execute("DROP VIEW MyView");
+			}
+		} finally {
+			cur.execute("DROP TABLE MyTable");
+		}
+	} finally {
+		cur.close();
+	}
 } finally {
-    cur.execute("DROP TABLE MyTable");
+	con.close();
 }
-
-cur.close();
-con.close();

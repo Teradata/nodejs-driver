@@ -5,33 +5,34 @@
 // This sample program assumes that StatementInfo parcel support is available from the Teradata Database.
 
 // @ts-ignore
-import { TeradataConnection, TeradataCursor } from "teradatasql";
+import * as teradatasql from "teradatasql";
 
 type Row = any[] | null;
 
-const con: TeradataConnection = new TeradataConnection();
+const con: teradatasql.TeradataConnection = teradatasql.connect({ host: "whomooz", user: "guest", password: "please" });
+try {
+	const cur: teradatasql.TeradataCursor = con.cursor();
+	try {
+		cur.execute("{fn teradata_rpo(S)}{fn teradata_fake_result_sets}select * from dbc.dbcinfo where infokey=?");
+		const row: Row = cur.fetchone();
 
-con.connect({ host: "whomooz", user: "guest", password: "please" });
+		if (row && cur.description) {
+			console.log("SQL statement metadata from prepare operation:");
+			console.log();
 
-const cur: TeradataCursor = con.cursor();
+			for (let i: number = 0; i < cur.description.length; i++) {
+				console.log(`   Column [${i}] ${cur.description[i][0].padEnd(18)} : ${row[i]}`);
+			}
 
-cur.execute("{fn teradata_rpo(S)}{fn teradata_fake_result_sets}select * from dbc.dbcinfo where infokey=?");
-const row: Row = cur.fetchone();
-
-if (row && cur.description) {
-    console.log("SQL statement metadata from prepare operation:");
-    console.log();
-
-    for (let i: number = 0; i < cur.description.length; i++) {
-        console.log(`   Column [${i}] ${cur.description[i][0].padEnd(18)} : ${row[i]}`);
-    }
-
-    console.log("Result set column metadata as JSON:");
-    console.log(JSON.parse(row[7]));
-    console.log();
-    console.log("Parameter marker metadata as JSON:");
-    console.log(JSON.parse(row[8]));
+			console.log("Result set column metadata as JSON:");
+			console.log(JSON.parse(row[7]));
+			console.log();
+			console.log("Parameter marker metadata as JSON:");
+			console.log(JSON.parse(row[8]));
+		}
+	} finally {
+		cur.close();
+	}
+} finally {
+	con.close();
 }
-
-cur.close();
-con.close();

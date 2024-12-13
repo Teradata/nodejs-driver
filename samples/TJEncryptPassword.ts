@@ -270,267 +270,273 @@
 //
 
 // @ts-ignore
-import { TeradataConnection, TeradataCursor, ITDConnParams, OperationalError } from "teradatasql";
-
+import * as teradatasql from "teradatasql";
 import * as fs from "fs";
 import * as crypto from "crypto";
 
 type Row = any[] | null;
 
 function convertJavaNames(sName: string, nKeySizeInBits: number = 0, sMode: string = ""): string {
-    // for list of available cypher names in node.js run command: openssl list -cipher-algorithms
-    if (sName === "AES") {
-        sName = "aes-" + nKeySizeInBits.toString() + "-" + sMode.toLowerCase(); // e.g., 'aes-128-ofb'
-    }
-    return sName;
+
+	// for list of available cypher names in node.js run command: openssl list -cipher-algorithms
+	if (sName === "AES") {
+		sName = "aes-" + nKeySizeInBits.toString() + "-" + sMode.toLowerCase(); // e.g., 'aes-128-ofb'
+	}
+
+	return sName;
+
 } // convertJavaNames
 
 function createPasswordEncryptionKeyFile(
-    sTransformation: string,
-    sAlgorithm: string,
-    sMatch: string,
-    sMac: string,
-    nKeySizeInBits: number,
-    sPassKeyFileName: string
+	sTransformation: string,
+	sAlgorithm: string,
+	sMatch: string,
+	sMac: string,
+	nKeySizeInBits: number,
+	sPassKeyFileName: string
 ): Buffer[] {
-    // Create encryption key
-    const nKeySizeInBytes: number = nKeySizeInBits / 8;
-    const abyKey: Buffer = crypto.randomBytes(nKeySizeInBytes);
+	// Create encryption key
+	const nKeySizeInBytes: number = nKeySizeInBits / 8;
+	const abyKey: Buffer = crypto.randomBytes(nKeySizeInBytes);
 
-    // Create MAC key
-    const nMacBlockSizeBytes: number = 64;
-    const abyMacKey: Buffer = crypto.randomBytes(nMacBlockSizeBytes);
+	// Create MAC key
+	const nMacBlockSizeBytes: number = 64;
+	const abyMacKey: Buffer = crypto.randomBytes(nMacBlockSizeBytes);
 
-    const sKeyHexDigits: string = abyKey.toString("hex");
-    const sMacKeyHexDigits: string = abyMacKey.toString("hex");
-    const fileData: string =
-        "# Teradata SQL Driver password encryption key file\n" +
-        "version=1\n" +
-        "transformation=" +
-        sTransformation +
-        "\n" +
-        "algorithm=" +
-        sAlgorithm +
-        "\n" +
-        "match=" +
-        sMatch +
-        "\n" +
-        "key=" +
-        sKeyHexDigits +
-        "\n" +
-        "mac=" +
-        sMac +
-        "\n" +
-        "mackey=" +
-        sMacKeyHexDigits +
-        "\n";
+	const sKeyHexDigits: string = abyKey.toString("hex");
+	const sMacKeyHexDigits: string = abyMacKey.toString("hex");
+	const fileData: string =
+		"# Teradata SQL Driver password encryption key file\n" +
+		"version=1\n" +
+		"transformation=" +
+		sTransformation +
+		"\n" +
+		"algorithm=" +
+		sAlgorithm +
+		"\n" +
+		"match=" +
+		sMatch +
+		"\n" +
+		"key=" +
+		sKeyHexDigits +
+		"\n" +
+		"mac=" +
+		sMac +
+		"\n" +
+		"mackey=" +
+		sMacKeyHexDigits +
+		"\n";
 
-    const asTransformationParts: string[] = sTransformation.split("/");
-    if (asTransformationParts.length !== 3) {
-        console.log(">>> Invalid transformation: " + sTransformation);
-        process.exit(1);
-    }
+	const asTransformationParts: string[] = sTransformation.split("/");
+	if (asTransformationParts.length !== 3) {
+		console.log(">>> Invalid transformation: " + sTransformation);
+		process.exit(1);
+	}
 
-    fs.writeFileSync(sPassKeyFileName, fileData, { encoding: "latin1" }); // Latin-1 stands for ISO-8859-1
-    return [abyKey, abyMacKey];
+	fs.writeFileSync(sPassKeyFileName, fileData, { encoding: "latin1" }); // Latin-1 stands for ISO-8859-1
+	return [abyKey, abyMacKey];
+
 } // createPasswordEncryptionKeyFile
 
 function createEncryptedPasswordFile(
-    sTransformation: string,
-    sAlgorithm: string,
-    sMatch: string,
-    sMac: string,
-    sMode: string,
-    nKeySizeInBits: number,
-    abyKey: Buffer,
-    abyMacKey: Buffer,
-    sEncPassFileName: string,
-    nCipherBlockSizeInBytes: number,
-    sPassword: string
+	sTransformation: string,
+	sAlgorithm: string,
+	sMatch: string,
+	sMac: string,
+	sMode: string,
+	nKeySizeInBits: number,
+	abyKey: Buffer,
+	abyMacKey: Buffer,
+	sEncPassFileName: string,
+	nCipherBlockSizeInBytes: number,
+	sPassword: string
 ): void {
-    let abyPassword: Buffer = Buffer.from(sPassword, "utf8");
+	let abyPassword: Buffer = Buffer.from(sPassword, "utf8");
 
-    // Create an initialization vector for the cipher
-    const abyIV: Buffer = crypto.randomBytes(nCipherBlockSizeInBytes);
+	// Create an initialization vector for the cipher
+	const abyIV: Buffer = crypto.randomBytes(nCipherBlockSizeInBytes);
 
-    // Encode the initialization vector as an octet string in der-format
-    const octetStringTag: number = 0x04; // The tag value for an octet string in der-format is 0x04
-    let abyASN1EncodedIV: Buffer = Buffer.allocUnsafe(2);
-    abyASN1EncodedIV[0] = octetStringTag;
-    abyASN1EncodedIV[1] = abyIV.length;
-    abyASN1EncodedIV = Buffer.concat([abyASN1EncodedIV, abyIV], abyASN1EncodedIV.length + abyIV.length);
+	// Encode the initialization vector as an octet string in der-format
+	const octetStringTag: number = 0x04; // The tag value for an octet string in der-format is 0x04
+	let abyASN1EncodedIV: Buffer = Buffer.allocUnsafe(2);
+	abyASN1EncodedIV[0] = octetStringTag;
+	abyASN1EncodedIV[1] = abyIV.length;
+	abyASN1EncodedIV = Buffer.concat([abyASN1EncodedIV, abyIV], abyASN1EncodedIV.length + abyIV.length);
 
-    // Zero-pad the password to the next 512-byte boundary and append null bytes to next 512 boundary
-    const nPlaintextByteCount: number = (Math.floor(abyPassword.length / 512) + 1) * 512;
-    const nTrailerByteCount: number = nPlaintextByteCount - abyPassword.length;
-    const emptyBuffer: Buffer = Buffer.alloc(nTrailerByteCount);
-    abyPassword = Buffer.concat([abyPassword, emptyBuffer], abyPassword.length + emptyBuffer.length);
+	// Zero-pad the password to the next 512-byte boundary and append null bytes to next 512 boundary
+	const nPlaintextByteCount: number = (Math.floor(abyPassword.length / 512) + 1) * 512;
+	const nTrailerByteCount: number = nPlaintextByteCount - abyPassword.length;
+	const emptyBuffer: Buffer = Buffer.alloc(nTrailerByteCount);
+	abyPassword = Buffer.concat([abyPassword, emptyBuffer], abyPassword.length + emptyBuffer.length);
 
-    // Create cipher and encrypt password
-    const nodeAlgorithmName: string = convertJavaNames(sAlgorithm, nKeySizeInBits, sMode);
-    const cipher: crypto.Cipher = crypto.createCipheriv(nodeAlgorithmName, abyKey, abyIV);
-    let abyEncryptedPassword: Buffer = cipher.update(abyPassword);
-    const finalCipher: Buffer = cipher.final();
-    abyEncryptedPassword = Buffer.concat([abyEncryptedPassword, finalCipher], abyEncryptedPassword.length + finalCipher.length);
+	// Create cipher and encrypt password
+	const nodeAlgorithmName: string = convertJavaNames(sAlgorithm, nKeySizeInBits, sMode);
+	const cipher: crypto.Cipher = crypto.createCipheriv(nodeAlgorithmName, abyKey, abyIV);
+	let abyEncryptedPassword: Buffer = cipher.update(abyPassword);
+	const finalCipher: Buffer = cipher.final();
+	abyEncryptedPassword = Buffer.concat([abyEncryptedPassword, finalCipher], abyEncryptedPassword.length + finalCipher.length);
 
-    // Create hex for encrypted password
-    const sEncryptedPasswordHexDigits: string = abyEncryptedPassword.toString("hex");
+	// Create hex for encrypted password
+	const sEncryptedPasswordHexDigits: string = abyEncryptedPassword.toString("hex");
 
-    // Create hex for parameters
-    const sASN1EncodedIVHexDigits: string = abyASN1EncodedIV.toString("hex");
+	// Create hex for parameters
+	const sASN1EncodedIVHexDigits: string = abyASN1EncodedIV.toString("hex");
 
-    // Create hex for 'hash' (using MAC key)
-    // The purpose of 'hash' is to be used to verify the integrity of encrypted password/parameters
-    const abyTransformation: Buffer = Buffer.from(sTransformation, "utf8");
-    const abyContentLength: number = abyEncryptedPassword.length + abyTransformation.length + abyASN1EncodedIV.length;
-    const abyContent: Buffer = Buffer.concat([abyEncryptedPassword, abyTransformation, abyASN1EncodedIV], abyContentLength);
-    sMac = sMac.slice(4).toLowerCase(); // e.g., slice 'HmacSHA256' to 'SHA256'
-    const hmac: crypto.Hmac = crypto.createHmac(sMac, abyMacKey);
-    hmac.update(abyContent);
-    const sHashHexDigits: string = hmac.digest("hex");
+	// Create hex for 'hash' (using MAC key)
+	// The purpose of 'hash' is to be used to verify the integrity of encrypted password/parameters
+	const abyTransformation: Buffer = Buffer.from(sTransformation, "utf8");
+	const abyContentLength: number = abyEncryptedPassword.length + abyTransformation.length + abyASN1EncodedIV.length;
+	const abyContent: Buffer = Buffer.concat([abyEncryptedPassword, abyTransformation, abyASN1EncodedIV], abyContentLength);
+	sMac = sMac.slice(4).toLowerCase(); // e.g., slice 'HmacSHA256' to 'SHA256'
+	const hmac: crypto.Hmac = crypto.createHmac(sMac, abyMacKey);
+	hmac.update(abyContent);
+	const sHashHexDigits: string = hmac.digest("hex");
 
-    const fileData: string =
-        "# Teradata SQL Driver encrypted password file\n" +
-        "version=1\n" +
-        "match=" +
-        sMatch +
-        "\n" +
-        "password=" +
-        sEncryptedPasswordHexDigits +
-        "\n" +
-        "params=" +
-        sASN1EncodedIVHexDigits +
-        "\n" +
-        "hash=" +
-        sHashHexDigits +
-        "\n";
+	const fileData: string =
+		"# Teradata SQL Driver encrypted password file\n" +
+		"version=1\n" +
+		"match=" +
+		sMatch +
+		"\n" +
+		"password=" +
+		sEncryptedPasswordHexDigits +
+		"\n" +
+		"params=" +
+		sASN1EncodedIVHexDigits +
+		"\n" +
+		"hash=" +
+		sHashHexDigits +
+		"\n";
 
-    fs.writeFileSync(sEncPassFileName, fileData, { encoding: "latin1" });
+	fs.writeFileSync(sEncPassFileName, fileData, { encoding: "latin1" });
+
 } // createEncryptedPasswordFile
 
 function loadPropertiesFile(sFileName: string): {} {
-    interface IProperties {
-        [key: string]: string;
-    }
-    const properties: IProperties = {};
-    const content: string = fs.readFileSync(sFileName, { encoding: "latin1" });
-    const lines: string[] = content.split("\n");
-    lines.forEach((line: string): void => {
-        line = line.trim();
-        if (line.indexOf("#") !== 0) {
-            const asTokens: string[] = line.split("=", 2);
-            if (asTokens.length === 2) {
-                const sKey: string = asTokens[0];
-                const sValue: string = asTokens[1];
-                properties[sKey] = sValue;
-            }
-        }
-    });
-    return properties;
+	interface IProperties {
+		[key: string]: string;
+	}
+	const properties: IProperties = {};
+	const content: string = fs.readFileSync(sFileName, { encoding: "latin1" });
+	const lines: string[] = content.split("\n");
+	lines.forEach((line: string): void => {
+		line = line.trim();
+		if (line.indexOf("#") !== 0) {
+			const asTokens: string[] = line.split("=", 2);
+			if (asTokens.length === 2) {
+				const sKey: string = asTokens[0];
+				const sValue: string = asTokens[1];
+				properties[sKey] = sValue;
+			}
+		}
+	});
+
+	return properties;
+
 } // loadPropertiesFile
 
 function decryptPassword(sPassKeyFileName: string, sEncPassFileName: string): void {
-    interface IMapPassKey {
-        [key: string]: string;
-    }
+	interface IMapPassKey {
+		[key: string]: string;
+	}
 
-    interface IMapEncPass {
-        [key: string]: string;
-    }
-    const mapPassKey: IMapPassKey = loadPropertiesFile(sPassKeyFileName);
-    const mapEncPass: IMapEncPass = loadPropertiesFile(sEncPassFileName);
+	interface IMapEncPass {
+		[key: string]: string;
+	}
+	const mapPassKey: IMapPassKey = loadPropertiesFile(sPassKeyFileName);
+	const mapEncPass: IMapEncPass = loadPropertiesFile(sEncPassFileName);
 
-    const algorithmString: string = "algorithm";
-    const hashString: string = "hash";
-    const keyString: string = "key";
-    const macString: string = "mac";
-    const mackeyString: string = "mackey";
-    const matchString: string = "match";
-    const paramsString: string = "params";
-    const passwordString: string = "password";
-    const transformationString: string = "transformation";
-    const versionString: string = "version";
+	const algorithmString: string = "algorithm";
+	const hashString: string = "hash";
+	const keyString: string = "key";
+	const macString: string = "mac";
+	const mackeyString: string = "mackey";
+	const matchString: string = "match";
+	const paramsString: string = "params";
+	const passwordString: string = "password";
+	const transformationString: string = "transformation";
+	const versionString: string = "version";
 
-    if (mapPassKey[versionString] !== "1") {
-        console.log("Unrecognized version %s in file %s", mapPassKey[versionString], sPassKeyFileName);
-        process.exit(1);
-    }
+	if (mapPassKey[versionString] !== "1") {
+		console.log("Unrecognized version %s in file %s", mapPassKey[versionString], sPassKeyFileName);
+		process.exit(1);
+	}
 
-    if (mapEncPass[versionString] !== "1") {
-        console.log("Unrecognized version %s in file %s", mapPassKey[versionString], sEncPassFileName);
-        process.exit(1);
-    }
+	if (mapEncPass[versionString] !== "1") {
+		console.log("Unrecognized version %s in file %s", mapPassKey[versionString], sEncPassFileName);
+		process.exit(1);
+	}
 
-    if (mapPassKey[matchString] !== mapEncPass[matchString]) {
-        console.log("Match value differs between files %s and %s", sPassKeyFileName, sEncPassFileName);
-        process.exit(1);
-    }
+	if (mapPassKey[matchString] !== mapEncPass[matchString]) {
+		console.log("Match value differs between files %s and %s", sPassKeyFileName, sEncPassFileName);
+		process.exit(1);
+	}
 
-    const sTransformation: string = mapPassKey[transformationString];
-    const sAlgorithm: string = mapPassKey[algorithmString];
-    const sKeyHexDigits: string = mapPassKey[keyString];
-    const sMACAlgorithm: string = mapPassKey[macString];
-    const sMacKeyHexDigits: string = mapPassKey[mackeyString];
+	const sTransformation: string = mapPassKey[transformationString];
+	const sAlgorithm: string = mapPassKey[algorithmString];
+	const sKeyHexDigits: string = mapPassKey[keyString];
+	const sMACAlgorithm: string = mapPassKey[macString];
+	const sMacKeyHexDigits: string = mapPassKey[mackeyString];
 
-    // While params is technically optional, an initialization vector is required by all three block
-    // cipher modes CBC, CFB, and OFB that are supported by the Teradata SQL Driver for Node.js.
-    // ECB does not require params, but ECB is not supported by the Teradata SQL Driver for Node.js.
-    const abyTransformation: Buffer = Buffer.from(sTransformation, "utf8");
-    const abyKey: Buffer = Buffer.from(sKeyHexDigits, "hex");
-    const abyMacKey: Buffer = Buffer.from(sMacKeyHexDigits, "hex");
-    const abyEncryptedPassword: Buffer = Buffer.from(mapEncPass[passwordString], "hex");
-    const abyASN1EncodedIV: Buffer = Buffer.from(mapEncPass[paramsString], "hex"); // required for CBC, CFB, and OFB
+	// While params is technically optional, an initialization vector is required by all three block
+	// cipher modes CBC, CFB, and OFB that are supported by the Teradata SQL Driver for Node.js.
+	// ECB does not require params, but ECB is not supported by the Teradata SQL Driver for Node.js.
+	const abyTransformation: Buffer = Buffer.from(sTransformation, "utf8");
+	const abyKey: Buffer = Buffer.from(sKeyHexDigits, "hex");
+	const abyMacKey: Buffer = Buffer.from(sMacKeyHexDigits, "hex");
+	const abyEncryptedPassword: Buffer = Buffer.from(mapEncPass[passwordString], "hex");
+	const abyASN1EncodedIV: Buffer = Buffer.from(mapEncPass[paramsString], "hex"); // required for CBC, CFB, and OFB
 
-    // Verify algorithm is part of transformation
-    const asTransformationParts: string[] = sTransformation.split("/");
-    const sMode: string = asTransformationParts[1];
-    if (sAlgorithm !== asTransformationParts[0]) {
-        console.log("Algorithm differs from transformation in file %s", sPassKeyFileName);
-        process.exit(1);
-    }
+	// Verify algorithm is part of transformation
+	const asTransformationParts: string[] = sTransformation.split("/");
+	const sMode: string = asTransformationParts[1];
+	if (sAlgorithm !== asTransformationParts[0]) {
+		console.log("Algorithm differs from transformation in file %s", sPassKeyFileName);
+		process.exit(1);
+	}
 
-    // Verify the hash value produced from encrypted password/params having the same value as the recorded one.
-    const abyContentLength: number = abyEncryptedPassword.length + abyTransformation.length + abyASN1EncodedIV.length;
-    const abyContent: Buffer = Buffer.concat([abyEncryptedPassword, abyTransformation, abyASN1EncodedIV], abyContentLength);
-    const sMac: string = sMACAlgorithm.slice(4).toLowerCase(); // e.g., slice 'HmacSHA256' to 'SHA256'
-    const hmac: crypto.Hmac = crypto.createHmac(sMac, abyMacKey); // Use MAC key
-    hmac.update(abyContent);
-    const hashHexDigits: string = hmac.digest("hex"); // Produce hash value
-    const sHashHexDigits: string = mapEncPass[hashString]; // Read the recorded hash value
-    if (hashHexDigits !== sHashHexDigits) {
-        console.log("Hash mismatch indicates possible tampering with file %s or %s", sPassKeyFileName, sEncPassFileName);
-        process.exit(1);
-    }
+	// Verify the hash value produced from encrypted password/params having the same value as the recorded one.
+	const abyContentLength: number = abyEncryptedPassword.length + abyTransformation.length + abyASN1EncodedIV.length;
+	const abyContent: Buffer = Buffer.concat([abyEncryptedPassword, abyTransformation, abyASN1EncodedIV], abyContentLength);
+	const sMac: string = sMACAlgorithm.slice(4).toLowerCase(); // e.g., slice 'HmacSHA256' to 'SHA256'
+	const hmac: crypto.Hmac = crypto.createHmac(sMac, abyMacKey); // Use MAC key
+	hmac.update(abyContent);
+	const hashHexDigits: string = hmac.digest("hex"); // Produce hash value
+	const sHashHexDigits: string = mapEncPass[hashString]; // Read the recorded hash value
+	if (hashHexDigits !== sHashHexDigits) {
+		console.log("Hash mismatch indicates possible tampering with file %s or %s", sPassKeyFileName, sEncPassFileName);
+		process.exit(1);
+	}
 
-    // Create decipher and decrypt the encrypted password
-    //    1. Lookup the Node.js algorithm name
-    const nKeySizeInBytes: number = abyKey.length;
-    const nKeySizeInBits: number = nKeySizeInBytes * 8;
-    const nodeAlgorithmName: string = convertJavaNames(sAlgorithm, nKeySizeInBits, sMode);
-    //    2. Retrieve the initialization vector value from 'params'
-    //       The params is encoded as octet string in der-format:
-    //         - The first byte is the id tag of the octet string (i.e., 0x04).
-    //         - The second byte is the length of payload (iv).
-    //         - The payload starts at the third byte of the octect string.
-    const abyIV: Buffer = abyASN1EncodedIV.slice(2, 2 + abyASN1EncodedIV[1]);
-    //    3. Create the decipher
-    const decipher: crypto.Decipher = crypto.createDecipheriv(nodeAlgorithmName, abyKey, abyIV);
-    //    4. Decrypt the password
-    const decrypted: Buffer = decipher.update(abyEncryptedPassword);
-    const finalCipher: Buffer = decipher.final();
-    const abyPassword: Buffer = Buffer.concat([decrypted, finalCipher], decrypted.length + finalCipher.length);
-    //    5. The password was zero-padded before it was encrypted.
-    //       Trim trailing zero byptes to obtain the original password.
-    const sPassword: string = abyPassword.slice(0, abyPassword.indexOf("\x00")).toString("utf8");
+	// Create decipher and decrypt the encrypted password
+	//    1. Lookup the Node.js algorithm name
+	const nKeySizeInBytes: number = abyKey.length;
+	const nKeySizeInBits: number = nKeySizeInBytes * 8;
+	const nodeAlgorithmName: string = convertJavaNames(sAlgorithm, nKeySizeInBits, sMode);
+	//    2. Retrieve the initialization vector value from 'params'
+	//       The params is encoded as octet string in der-format:
+	//         - The first byte is the id tag of the octet string (i.e., 0x04).
+	//         - The second byte is the length of payload (iv).
+	//         - The payload starts at the third byte of the octect string.
+	const abyIV: Buffer = abyASN1EncodedIV.slice(2, 2 + abyASN1EncodedIV[1]);
+	//    3. Create the decipher
+	const decipher: crypto.Decipher = crypto.createDecipheriv(nodeAlgorithmName, abyKey, abyIV);
+	//    4. Decrypt the password
+	const decrypted: Buffer = decipher.update(abyEncryptedPassword);
+	const finalCipher: Buffer = decipher.final();
+	const abyPassword: Buffer = Buffer.concat([decrypted, finalCipher], decrypted.length + finalCipher.length);
+	//    5. The password was zero-padded before it was encrypted.
+	//       Trim trailing zero byptes to obtain the original password.
+	const sPassword: string = abyPassword.slice(0, abyPassword.indexOf("\x00")).toString("utf8");
 
-    console.log("Decrypted password: %s", sPassword);
+	console.log("Decrypted password: %s", sPassword);
 } // decryptPassword
 
 if (process.argv.length !== 10) {
-    console.log(
-        "Parameters: Transformation KeySizeInBits MAC PasswordEncryptionKeyFileName EncryptedPasswordFileName" + " Hostname Username Password"
-    );
-    process.exit(1);
+	console.log(
+		"Parameters: Transformation KeySizeInBits MAC PasswordEncryptionKeyFileName EncryptedPasswordFileName" + " Hostname Username Password"
+	);
+	process.exit(1);
 }
 const sTransformation: string = process.argv[2];
 const sKeySizeInBits: string = process.argv[3];
@@ -543,8 +549,8 @@ let sPassword: string = process.argv[9];
 
 const asTransformationParts: string[] = sTransformation.split("/");
 if (asTransformationParts.length !== 3) {
-    console.log("Invalid transformation: " + sTransformation);
-    process.exit(1);
+	console.log("Invalid transformation: " + sTransformation);
+	process.exit(1);
 }
 
 const sAlgorithm: string = asTransformationParts[0];
@@ -552,28 +558,28 @@ const sMode: string = asTransformationParts[1];
 const sPadding: string = asTransformationParts[2];
 
 if ("AES".indexOf(sAlgorithm) < 0) {
-    console.log("Unknown algorithm " + sAlgorithm);
-    process.exit(1);
+	console.log("Unknown algorithm " + sAlgorithm);
+	process.exit(1);
 }
 
 if (["CBC", "CFB", "OFB"].indexOf(sMode) < 0) {
-    console.log("Unknown mode " + sMode);
-    process.exit(1);
+	console.log("Unknown mode " + sMode);
+	process.exit(1);
 }
 
 if (["PKCS5Padding", "NoPadding"].indexOf(sPadding) < 0) {
-    console.log("Unknown padding " + sPadding);
-    process.exit(1);
+	console.log("Unknown padding " + sPadding);
+	process.exit(1);
 }
 
 if (["HmacSHA1", "HmacSHA256"].indexOf(sMac) < 0) {
-    console.log("Unknown MAC algorithm " + sMac);
-    process.exit(1);
+	console.log("Unknown MAC algorithm " + sMac);
+	process.exit(1);
 }
 
 if (!sPassword) {
-    console.log("Password cannot be zero length");
-    process.exit(1);
+	console.log("Password cannot be zero length");
+	process.exit(1);
 }
 
 const nKeySizeInBits: number = parseInt(sKeySizeInBits, 10);
@@ -581,50 +587,41 @@ const match: string = Date.now().toString();
 let nCipherBlockSizeInBytes: number = 0;
 
 if (sAlgorithm === "AES") {
-    nCipherBlockSizeInBytes = 16;
+	nCipherBlockSizeInBytes = 16;
 } else {
-    nCipherBlockSizeInBytes = 8;
+	nCipherBlockSizeInBytes = 8;
 }
 
 const encryptKeys: Buffer[] = createPasswordEncryptionKeyFile(sTransformation, sAlgorithm, match, sMac, nKeySizeInBits, sPassKeyFileName);
 
 createEncryptedPasswordFile(
-    sTransformation,
-    sAlgorithm,
-    match,
-    sMac,
-    sMode,
-    nKeySizeInBits,
-    encryptKeys[0],
-    encryptKeys[1],
-    sEncPassFileName,
-    nCipherBlockSizeInBytes,
-    sPassword
+	sTransformation,
+	sAlgorithm,
+	match,
+	sMac,
+	sMode,
+	nKeySizeInBits,
+	encryptKeys[0],
+	encryptKeys[1],
+	sEncPassFileName,
+	nCipherBlockSizeInBytes,
+	sPassword
 );
 
 decryptPassword(sPassKeyFileName, sEncPassFileName);
 
 sPassword = "ENCRYPTED_PASSWORD(file:" + sPassKeyFileName + ",file:" + sEncPassFileName + ")";
 
-const connParams: ITDConnParams = {
-    host: sHostname,
-    password: sPassword,
-    user: sUsername,
-};
-
+const con: teradatasql.TeradataConnection = teradatasql.connect({ host: sHostname, user: sUsername, password: sPassword });
 try {
-    const con: TeradataConnection = new TeradataConnection();
-    con.connect(connParams);
-    const cur: TeradataCursor = con.cursor();
-    cur.execute("select user, session");
-    const row: Row = cur.fetchone();
-    console.log(row);
-    cur.close();
-    con.close();
-} catch (error: any) {
-    if (error instanceof OperationalError) {
-        console.log(error.message);
-    } else {
-        console.log(error);
-    }
+	const cur: teradatasql.TeradataCursor = con.cursor();
+	try {
+		cur.execute("select user, session");
+		const row: Row = cur.fetchone();
+		console.log(row);
+	} finally {
+		cur.close();
+	}
+} finally {
+	con.close();
 }

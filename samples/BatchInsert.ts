@@ -3,24 +3,25 @@
 // This sample program demonstrates how to insert a batch of rows.
 
 // @ts-ignore
-import { TeradataConnection, TeradataCursor } from "teradatasql";
+import * as teradatasql from "teradatasql";
 
-const con: TeradataConnection = new TeradataConnection();
+const con: teradatasql.TeradataConnection = teradatasql.connect({ host: "whomooz", user: "guest", password: "please" });
+try {
+	const cur: teradatasql.TeradataCursor = con.cursor();
+	try {
+		cur.execute("create volatile table voltab (c1 integer, c2 varchar(100)) on commit preserve rows");
 
-con.connect({ host: "whomooz", user: "guest", password: "please" });
+		cur.execute("insert into voltab (?, ?)", [
+			[1, "abc"],
+			[2, "def"],
+			[3, "ghi"],
+		]);
 
-const cur: TeradataCursor = con.cursor();
-
-cur.execute("create volatile table voltab (c1 integer, c2 varchar(100)) on commit preserve rows");
-
-cur.execute("insert into voltab (?, ?)", [
-    [1, "abc"],
-    [2, "def"],
-    [3, "ghi"],
-]);
-
-cur.execute("select * from voltab order by 1");
-console.log(cur.fetchall());
-
-cur.close();
-con.close();
+		cur.execute("select * from voltab order by 1");
+		console.log(cur.fetchall());
+	} finally {
+		cur.close();
+	}
+} finally {
+	con.close();
+}

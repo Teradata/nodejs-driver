@@ -2,7 +2,12 @@
 
 This package enables Node.js applications to connect to the Teradata Database.
 
-This package requires 64-bit Node.js 16.20.2 or later, and runs on Windows, macOS, and Linux. 32-bit Node.js is not supported.
+This package requires 64-bit Node.js 16.20.2 or later and runs on the following operating systems and processor architectures. 32-bit Node.js is not supported.
+* Windows x64 on 64-bit Intel and AMD processors
+* macOS on 64-bit ARM processors
+* macOS on 64-bit Intel processors
+* Linux x64 on 64-bit Intel and AMD processors
+* Linux ARM64 on 64-bit ARM processors
 
 For community support, please visit [Teradata Community](https://support.teradata.com/community).
 
@@ -45,6 +50,7 @@ Copyright 2024 Teradata. All Rights Reserved.
 * [FastExport](#FastExport)
 * [CSV Batch Inserts](#CSVBatchInserts)
 * [CSV Export Results](#CSVExportResults)
+* [Command Line Interface](#CommandLineInterface)
 * [Change Log](#ChangeLog)
 
 <a id="Features"></a>
@@ -158,30 +164,31 @@ Program                                                                         
 
 ### Using the Driver
 
-Example usage of establishing a connection:
-```
+Your JavaScript program must import the `teradatasql` package in order to use the driver.
+
     const teradatasql = require("teradatasql");
 
-    const con = teradatasql.connect({
-        host: 'whomooz',
-        user: 'guest',
-        password: 'please'
-    });
-```
+After importing the `teradatasql` package, your JavaScript program calls the `teradatasql.connect` function to open a connection to the database.
 
-You may specify connection parameters as a JavaScript object, as a JSON string, or using a combination of the two approaches. The TeradataConnection.connect function's first argument is a JavaScript object. The TeradataConnection.connect function's second arguments is an optional JSON string.
+    const con = teradatasql.connect({
+        host: "whomooz",
+        user: "guest",
+        password: "please"
+    });
+
+You may specify connection parameters as a JavaScript object, as a JSON string, or using a combination of the two approaches. The `teradatasql.connect` function's first argument is a JavaScript object. The `teradatasql.connect` function's second argument is an optional JSON string.
 
 Connection parameters specified only as a JavaScript object:
 
-    con = teradataConnection.connect({host:"whomooz",user:"guest",password:"please"})
+    con = teradatasql.connect({host:"whomooz",user:"guest",password:"please"});
 
 Connection parameters specified as a JSON string:
 
-    con = teradataConnection.connect({}, '{"host":"whomooz", "user":"guest", "password":"please"}')
+    con = teradatasql.connect({}, '{"host":"whomooz", "user":"guest", "password":"please"}');
 
 Connection parameters specified using a combination:
 
-    con = teradataConnection.connect({host:"whomooz"}, '{"user":"guest", "password":"please"}')
+    con = teradatasql.connect({host:"whomooz"}, '{"user":"guest", "password":"please"}');
 
 When a combination of parameters are specified, connection parameters specified as a JSON string take precedence over same-named connection parameters specified in the JavaScript object.
 
@@ -486,7 +493,7 @@ The following table describes the logon authentication methods selected by the `
 `BROWSER` | Browser Authentication, also known as OIDC Authorization Code Flow with Proof Key for Code Exchange (PKCE) | `user`, `password`, and `logdata` must all be omitted when using Browser Authentication.<br/>`browser`, `browser_tab_timeout`, `browser_timeout`, `oidc_clientid`, `oidc_scope`, and `oidc_token` are optional parameters when using this method.<br/>Browser Authentication is supported for Windows and macOS. Browser Authentication is not supported for other operating systems.<br/>The database user must have the "logon with null password" permission.<br/>The database must be configured with Identity Provider information for Federated Authentication. These tasks are covered in the reference Teradata Vantage&trade; Security Administration.
 `CODE`    | OIDC Device Code Flow, also known as OIDC Device Authorization Grant | `user`, `password`, and `logdata` must all be omitted when using this method.<br/>`code_append_file`, `oidc_clientid`, `oidc_scope`, and `oidc_token` are optional parameters when using this method.<br/>The database user must have the "logon with null password" permission.<br/>The database must be configured with Identity Provider information for Federated Authentication. These tasks are covered in the reference Teradata Vantage&trade; Security Administration.
 `CRED`    | OIDC Client Credentials Grant with client_secret_post for client authentication | `user`, `password`, `oidc_clientid`, and `oidc_scope` must all be omitted when using this method.<br/>`logdata` must contain the Client Credentials Grant request HTTP POST Form Data encoded as Content-Type application/x-www-form-urlencoded.<br/>`oidc_token` is an optional parameter when using this method.<br/>The database user must have the "logon with null password" permission.<br/>The database must be configured with Identity Provider information for Federated Authentication. These tasks are covered in the reference Teradata Vantage&trade; Security Administration.
-`JWT`     | JSON Web Token (JWT) | `logdata` must contain `token=` followed by the JSON Web Token.<br/>The database user must have the "logon with null password" permission.<br/>Your application must obtain a valid JWT from a User Service that is accessible to your application. The database must be configured to trust JWTs issued by your User Service. These tasks are covered in the reference Teradata Vantage&trade; Security Administration.
+`JWT`     | JSON Web Token (JWT) | `logdata` must contain `token=` followed by the JSON Web Token.<br/>The database user must have the "logon with null password" permission.<br/>Your application must obtain a valid JWT from an Identity Provider. The database must be configured to trust JWTs issued by your Identity Provider. These tasks are covered in the reference Teradata Vantage&trade; Security Administration.
 `KRB5`    | GSS-API Kerberos V5 | Requires a significant number of administration tasks on the machine that is running the driver.<br/>For Kerberos Single Sign On (SSO), the database user must have the "logon with null password" permission.
 `LDAP`    | GSS-API Lightweight Directory Access Protocol (LDAP) | Requires a significant administration effort to set up the LDAP environment. These tasks are covered in the reference Teradata Vantage&trade; Security Administration.<br/>Once they are complete, LDAP can be used without any additional work required on the machine that is running the driver.
 `ROPC`    | OIDC Resource Owner Password Credentials (ROPC) | `logdata` must be omitted when using this method.<br/>`user` and `password` are required when using this method.<br/>`oidc_clientid`, `oidc_scope`, and `oidc_token` are optional parameters when using this method.<br/>The database user must have the "logon with null password" permission.<br/>The database must be configured with Identity Provider information for Federated Authentication. These tasks are covered in the reference Teradata Vantage&trade; Security Administration.
@@ -528,7 +535,7 @@ Client Attribute            | Source   | Description
 `ServerConfType`            | database | The confidentiality type, as determined by the database<br/>`T` - TLS used for encryption<br/>`E` - TDGSS used for encryption<br/>`U` - Data transfer is unencrypted
 `ClientConfVersion`         | database | The TLS version as determined by the database, if this is an HTTPS/TLS connection
 `ClientConfCipherSuite`     | database | The TLS cipher as determined by the database, if this is an HTTPS/TLS connection
-`ClientAttributesEx`        | driver   | Additional Client Attributes are available in this column as a list of name=value pairs, each terminated by a semicolon. Individual values can be accessed using the `NVP` system function.<br/>`NODEJS` - The Node.js version<br/>`GO` - The Go version<br/>`SCS` - The session character set<br/>`CCS` - The client character set<br/>`LOB` - Y/N indicator for LOB support<br/>`SIP` - Y/N indicator for StatementInfo parcel support<br/>`TM` - The transaction mode indicator A (ANSI) or T (TERA)<br/>`ENC` - Y/N indicator for `encryptdata` connection parameter<br/>`DP` - The `dbs_port` connection parameter<br/>`HP` - The `https_port` connection parameter<br/>`OSL` - Numeric level corresponding to `oidc_sslmode`<br/>`OSM` - The `oidc_sslmode` connection parameter<br/>`SSL` - Numeric level corresponding to `sslmode`<br/>`SSLM` - The `sslmode` connection parameter<br/>`CRC` - The `sslcrc` connection parameter<br/>`OCSP` - Y/N indicator for `sslocsp` connection parameter<br/>`CRL` - Y/N indicator for `sslcrl` connection parameter<br/>`CERT` - The database TLS certificate status<br/>`BA` - Y/N indicator for Browser Authentication<br/>`LM` - The logon authentication method<br/>`JWS` - The JSON Web Signature (JWS) algorithm<br/>`JH` - JWT header parameters to identify signature key<br/>`IDPC` - The Identity Provider TLS certificate status<br/><br/>The `CERT` and `IDPC` attributes indicate the TLS certificate status of an HTTPS/TLS connection. When the attribute indicates the TLS certificate is valid (`V`) or invalid (`I`), then additional TLS certificate status details are provided as a series of comma-separated two-letter codes.<br/>`U` - the TLS certificate status is unavailable<br/>`V` - the TLS certificate status is valid<br/>`I` - the TLS certificate status is invalid<br/>`PU` - sslca PEM file is unavailable for server certificate verification<br/>`PA` - server certificate was verified using sslca PEM file<br/>`PR` - server certificate was rejected using sslca PEM file<br/>`DU` - sslcapath PEM directory is unavailable for server certificate verification<br/>`DA` - server certificate was verified using sslcapath PEM directory<br/>`DR` - server certificate was rejected using sslcapath PEM directory<br/>`TA` - server certificate was verified by the system<br/>`TR` - server certificate was rejected by the system<br/>`CY` - server certificate passed VERIFY-CA check<br/>`CN` - server certificate failed VERIFY-CA check<br/>`HU` - server hostname is unavailable for server certificate matching, because database IP address was specified<br/>`HY` - server hostname matches server certificate<br/>`HN` - server hostname does not match server certificate<br/>`RU` - resolved server hostname is unavailable for server certificate matching, because database IP address was specified<br/>`RY` - resolved server hostname matches server certificate<br/>`RN` - resolved server hostname does not match server certificate<br/>`IY` - IP address matches server certificate<br/>`IN` - IP address does not match server certificate<br/>`FY` - server certificate passed VERIFY-FULL check<br/>`FN` - server certificate failed VERIFY-FULL check<br/>`SU` - certificate revocation check status is unavailable<br/>`SG` - certificate revocation check status is good<br/>`SR` - certificate revocation check status is revoked
+`ClientAttributesEx`        | driver   | Additional Client Attributes are available in the `ClientAttributesEx` column as a list of name=value pairs, each terminated by a semicolon. Individual values can be accessed using the `NVP` system function.<br/>`BA` - Y/N indicator for Browser Authentication<br/>`CCS` - The client character set<br/>`CERT` - The database TLS certificate status<br/>`CRC` - The `sslcrc` connection parameter<br/>`CRL` - Y/N indicator for `sslcrl` connection parameter<br/>`DP` - The `dbs_port` connection parameter<br/>`ENC` - Y/N indicator for `encryptdata` connection parameter<br/>`GO` - The Go version<br/>`HP` - The `https_port` connection parameter<br/>`IDPC` - The Identity Provider TLS certificate status<br/>`JH` - JWT header parameters to identify signature key<br/>`JWS` - The JSON Web Signature (JWS) algorithm<br/>`LM` - The logon authentication method<br/>`LOB` - Y/N indicator for LOB support<br/>`NODEJS` - The Node.js version<br/>`OC` - OIDC token cache status O (off) M (miss) H (hit) X (expired)<br/>`OCSP` - Y/N indicator for `sslocsp` connection parameter<br/>`OSL` - Numeric level corresponding to `oidc_sslmode`<br/>`OSM` - The `oidc_sslmode` connection parameter<br/>`RT` - Y/N indicator for OIDC refresh token available<br/>`SCS` - The session character set<br/>`SIP` - Y/N indicator for StatementInfo parcel support<br/>`SSL` - Numeric level corresponding to `sslmode`<br/>`SSLM` - The `sslmode` connection parameter<br/>`TC` - OIDC token reuse count<br/>`TM` - The transaction mode indicator A (ANSI) or T (TERA)<br/>`TT` - OIDC token time-to-live in seconds<br/>`TZ` - The Node.js current time zone<br/><br/>The `CERT` and `IDPC` attributes indicate the TLS certificate status of an HTTPS/TLS connection. When the attribute indicates the TLS certificate is valid (`V`) or invalid (`I`), then additional TLS certificate status details are provided as a series of comma-separated two-letter codes.<br/>`U` - the TLS certificate status is unavailable<br/>`V` - the TLS certificate status is valid<br/>`I` - the TLS certificate status is invalid<br/>`PU` - sslca PEM file is unavailable for server certificate verification<br/>`PA` - server certificate was verified using sslca PEM file<br/>`PR` - server certificate was rejected using sslca PEM file<br/>`DU` - sslcapath PEM directory is unavailable for server certificate verification<br/>`DA` - server certificate was verified using sslcapath PEM directory<br/>`DR` - server certificate was rejected using sslcapath PEM directory<br/>`TA` - server certificate was verified by the system<br/>`TR` - server certificate was rejected by the system<br/>`CY` - server certificate passed VERIFY-CA check<br/>`CN` - server certificate failed VERIFY-CA check<br/>`HU` - server hostname is unavailable for server certificate matching, because database IP address was specified<br/>`HY` - server hostname matches server certificate<br/>`HN` - server hostname does not match server certificate<br/>`RU` - resolved server hostname is unavailable for server certificate matching, because database IP address was specified<br/>`RY` - resolved server hostname matches server certificate<br/>`RN` - resolved server hostname does not match server certificate<br/>`IY` - IP address matches server certificate<br/>`IN` - IP address does not match server certificate<br/>`FY` - server certificate passed VERIFY-FULL check<br/>`FN` - server certificate failed VERIFY-FULL check<br/>`SU` - certificate revocation check status is unavailable<br/>`SG` - certificate revocation check status is good<br/>`SR` - certificate revocation check status is revoked
 
 #### LogonSource Column
 
@@ -864,6 +871,14 @@ Creates and returns a new Cursor object for the Connection.
 
 ---
 
+`.nativeSQL(` *SQLRequest* `)`
+
+Returns the specified SQL request text after conversion to native Teradata SQL. Equivalent to the JDBC API `Connection.nativeSQL` method.
+
+The `{fn teradata_nativesql}` escape clause is automatically prepended to the SQL request before processing.
+
+---
+
 `.rollback()`
 
 Rolls back the current transaction.
@@ -875,6 +890,12 @@ Rolls back the current transaction.
 `.arraysize`
 
 Read/write `number` attribute specifying the number of rows to fetch at a time with the `.fetchmany()` method and the `.fetchall()` method. Defaults to `1` meaning fetch a single row at a time.
+
+---
+
+`.columntypename`
+
+Read-only attribute consisting of a sequence of result set column type names, available after a SQL request is executed.
 
 ---
 
@@ -1200,6 +1221,8 @@ When a SQL request contains the native SQL escape clause, all escape clauses are
 
 `{fn teradata_nativesql}`
 
+This escape clause is automatically prepended to the SQL request when the connection `.nativeSQL` method is called.
+
 #### Connection Functions
 
 The following table lists connection function escape clauses that are intended for use with the native SQL escape clause `{fn teradata_nativesql}`.
@@ -1466,9 +1489,44 @@ Limitations when exporting to CSV files:
 * Not all data types are supported. For example, `BLOB`, `BYTE`, and `VARBYTE` are not supported and if one of these column types are present in the result set, an error will be returned.
 * `CLOB`, `XML`, `JSON`, and `DATASET STORAGE FORMAT CSV` data types are supported for SQL query results and are exported as string values, but these data types are not supported by FastExport.
 
+<a id="CommandLineInterface"></a>
+
+### Command Line Interface
+
+The `teradatasql` package provides a command line interface via the `npx` package runner.
+
+Running the `teradatasql` package without additional arguments prints a usage message.
+
+    npx teradatasql
+
+Any number of arguments can follow the `teradatasql` package name on the command line, and arguments can be repeated on the command line.
+
+The command line interface can print the `teradatasql` version number.
+
+    npx teradatasql version
+
+Specify connection parameters to connect to a database.
+
+Connection parameters begin with `host=` and consist of comma-separated key`=`value pairs. A repeated comma `,,` in a connection parameter value is treated as a single literal comma.
+
+    npx teradatasql host=whomooz,user=guest,password=please
+
+This feature serves as a database connectivity test.
+
+SQL requests can be executed after a database connection is established.
+
+    npx teradatasql host=whomooz,user=guest,password=please "select * from DBC.DBCInfo"
+
 <a id="ChangeLog"></a>
 
 ### Change Log
+
+`20.0.21` - December 12, 2024
+* Provide driver version number and session number in Teradata Security exceptions
+* Add teradatasql package command line interface
+* Add connection method `.nativeSQL`
+* Add cursor attribute `columntypename`
+* Add time zone to ClientAttributesEx
 
 `20.0.20` - October 25, 2024
 * GOSQL-212 handle Microsoft Entra OIDC Authorization Code Response redirect error parameters

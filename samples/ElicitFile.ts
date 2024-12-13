@@ -5,29 +5,30 @@
 // This sample program requires the udfinc.c source file to be located in the current directory.
 
 // @ts-ignore
-import { TeradataConnection, TeradataCursor } from "teradatasql";
+import * as teradatasql from "teradatasql";
 
 type Row = any[] | null;
 
-const con: TeradataConnection = new TeradataConnection();
+const con: teradatasql.TeradataConnection = teradatasql.connect({ host: "whomooz", user: "guest", password: "please" });
+try {
+	const cur: teradatasql.TeradataCursor = con.cursor();
+	try {
+		console.log("Create function");
+		cur.execute("create function myudfinc(integer) returns integer language c no sql parameter style sql external name 'CS!udfinc!udfinc.c!F!udfinc'");
 
-con.connect({ host: "whomooz", user: "guest", password: "please" });
+		console.log("Execute function");
+		cur.execute("select myudfinc(1)");
 
-const cur: TeradataCursor = con.cursor();
+		const row: Row = cur.fetchone();
+		if (row) {
+			console.log("Function returned", row[0]);
+		}
 
-console.log("Create function");
-cur.execute("create function myudfinc(integer) returns integer language c no sql parameter style sql external name 'CS!udfinc!udfinc.c!F!udfinc'");
-
-console.log("Execute function");
-cur.execute("select myudfinc(1)");
-
-const row: Row = cur.fetchone();
-if (row) {
-    console.log("Function returned", row[0]);
+		console.log("Drop function");
+		cur.execute("drop function myudfinc");
+	} finally {
+		cur.close();
+	}
+} finally {
+	con.close();
 }
-
-console.log("Drop function");
-cur.execute("drop function myudfinc");
-
-cur.close();
-con.close();

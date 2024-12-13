@@ -7,40 +7,41 @@
 import * as fs from "fs";
 import { parse } from "csv-parse/sync";
 // @ts-ignore
-import { TeradataConnection, TeradataCursor } from "teradatasql";
+import * as teradatasql from "teradatasql";
 
-const con: TeradataConnection = new TeradataConnection();
-
-con.connect({ host: "whomooz", user: "guest", password: "please" });
-
-const cur: TeradataCursor = con.cursor();
-
-cur.execute("create volatile table voltab (c1 integer, c2 varchar(100)) on commit preserve rows");
-
-console.log("Inserting data");
-cur.execute("insert into voltab values (?, ?)", [
-    [1, ""],
-    [2, "abc"],
-    [3, "def"],
-    [4, "mno"],
-    [5, ""],
-    [6, "pqr"],
-    [7, "uvw"],
-    [8, "xyz"],
-    [9, ""],
-]);
-
-const sFileName: string = "dataJs.csv";
-console.log("Exporting table data to file", sFileName);
-cur.execute("{fn teradata_write_csv(" + sFileName + ")}select * from voltab order by 1");
-
+const con: teradatasql.TeradataConnection = teradatasql.connect({ host: "whomooz", user: "guest", password: "please" });
 try {
-    console.log("Reading file", sFileName);
-    const sRows: string[][] = parse(fs.readFileSync(sFileName, { encoding: "utf-8" }));
-    console.log(sRows);
-} finally {
-    fs.unlinkSync(sFileName);
-}
+	const cur: teradatasql.TeradataCursor = con.cursor();
+	try {
+		cur.execute("create volatile table voltab (c1 integer, c2 varchar(100)) on commit preserve rows");
 
-cur.close();
-con.close();
+		console.log("Inserting data");
+		cur.execute("insert into voltab values (?, ?)", [
+			[1, ""],
+			[2, "abc"],
+			[3, "def"],
+			[4, "mno"],
+			[5, ""],
+			[6, "pqr"],
+			[7, "uvw"],
+			[8, "xyz"],
+			[9, ""],
+		]);
+
+		const sFileName: string = "dataJs.csv";
+		console.log("Exporting table data to file", sFileName);
+		cur.execute("{fn teradata_write_csv(" + sFileName + ")}select * from voltab order by 1");
+
+		try {
+			console.log("Reading file", sFileName);
+			const sRows: string[][] = parse(fs.readFileSync(sFileName, { encoding: "utf-8" }));
+			console.log(sRows);
+		} finally {
+			fs.unlinkSync(sFileName);
+		}
+	} finally {
+		cur.close();
+	}
+} finally {
+	con.close();
+}

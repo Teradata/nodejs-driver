@@ -4,22 +4,23 @@
 // Teradata SQL Driver for Node.js and the Teradata Database.
 
 // @ts-ignore
-import { TeradataConnection, TeradataCursor } from "teradatasql";
+import * as teradatasql from "teradatasql";
 
 type Row = any[] | null;
 
-const con: TeradataConnection = new TeradataConnection();
+const con: teradatasql.TeradataConnection = teradatasql.connect({ host: "whomooz", user: "guest", password: "please" });
+try {
+	const cur: teradatasql.TeradataCursor = con.cursor();
+	try {
+		cur.execute("{fn teradata_nativesql}Driver version {fn teradata_driver_version}  Database version {fn teradata_database_version}");
 
-con.connect({ host: "whomooz", user: "guest", password: "please" });
-
-const cur: TeradataCursor = con.cursor();
-
-cur.execute("{fn teradata_nativesql}Driver version {fn teradata_driver_version}  Database version {fn teradata_database_version}");
-
-const row: Row = cur.fetchone();
-if (row) {
-    console.log(row[0]);
+		const row: Row = cur.fetchone();
+		if (row) {
+			console.log(row[0]);
+		}
+	} finally {
+		cur.close();
+	}
+} finally {
+	con.close();
 }
-
-cur.close();
-con.close();

@@ -5,80 +5,83 @@
 //  and then subsequently read the LOB values from the LOB locators.
 
 // @ts-ignore
-import { TeradataConnection, TeradataCursor } from "teradatasql";
+import * as teradatasql from "teradatasql";
 
 type Row = any[] | null;
 
 function byte(s: string, encoding?: BufferEncoding): Uint8Array {
-    return Uint8Array.from(Buffer.from(s, encoding));
+	return Uint8Array.from(Buffer.from(s, encoding));
 }
 
-function ReadLobValueFromLobLocator(con: TeradataConnection, abyLocator: Uint8Array, sTypeName: string): any {
-    if (!(abyLocator instanceof Uint8Array)) {
-        throw TypeError("abyLocator must be Unint8Array");
-    }
+function ReadLobValueFromLobLocator(con: teradatasql.TeradataConnection, abyLocator: Uint8Array, sTypeName: string): any {
+	if (!(abyLocator instanceof Uint8Array)) {
+		throw TypeError("abyLocator must be Unint8Array");
+	}
 
-    const cur: TeradataCursor = con.cursor();
+	let result: any = null;
 
-    sSQL = "{fn teradata_parameter(1," + sTypeName + ")}select ?";
-    console.log(sSQL);
-    cur.execute(sSQL, [abyLocator]);
+	const cur: teradatasql.TeradataCursor = con.cursor();
+	try {
+		let sSQL: string = "{fn teradata_parameter(1," + sTypeName + ")}select ?";
+		console.log(sSQL);
+		cur.execute(sSQL, [abyLocator]);
 
-    const row: Row = cur.fetchone();
+		const row: Row = cur.fetchone();
 
-    let result: any = null;
-    if (row) {
-        result = row[0];
-    }
+		if (row) {
+			result = row[0];
+		}
+	} finally {
+		cur.close();
+	}
 
-    cur.close();
-
-    return result;
+	return result;
 }
 
-const con: TeradataConnection = new TeradataConnection();
+const con: teradatasql.TeradataConnection = teradatasql.connect({ host: "whomooz", user: "guest", password: "please" });
+try {
+	const cur: teradatasql.TeradataCursor = con.cursor();
+	try {
+		let sSQL: string = "create volatile table voltab (c1 integer, c2 blob, c3 clob, c4 xml, c5 st_geometry, c6 json) on commit preserve rows";
+		console.log(sSQL);
+		cur.execute(sSQL);
 
-con.connect({ host: "whomooz", user: "guest", password: "please" });
+		const sXML: string = '<?xml version="1.0" encoding="UTF-8"?><foo>bar</foo>';
+		const sJSON: string = '{"foo":"bar"}';
 
-const cur: TeradataCursor = con.cursor();
+		sSQL =
+			"insert into voltab values (1, '" + Buffer.from(byte("ABC")).toString("hex") + "'xbv, 'clobval', '" + sXML + "', 'point(1 2)', '" + sJSON + "')";
+		console.log(sSQL);
+		cur.execute(sSQL);
 
-let sSQL: string = "create volatile table voltab (c1 integer, c2 blob, c3 clob, c4 xml, c5 st_geometry, c6 json) on commit preserve rows";
-console.log(sSQL);
-cur.execute(sSQL);
+		sSQL = "{fn teradata_lobselect(S)}{fn teradata_fake_result_sets}select * from voltab order by 1";
+		console.log(sSQL);
+		cur.execute(sSQL);
 
-const sXML: string = '<?xml version="1.0" encoding="UTF-8"?><foo>bar</foo>';
-const sJSON: string = '{"foo":"bar"}';
+		const aoFakeResultSetRow: Row = cur.fetchone();
 
-sSQL =
-    "insert into voltab values (1, '" + Buffer.from(byte("ABC")).toString("hex") + "'xbv, 'clobval', '" + sXML + "', 'point(1 2)', '" + sJSON + "')";
-console.log(sSQL);
-cur.execute(sSQL);
+		if (aoFakeResultSetRow) {
+			const sResultSetColumnMetadataJSON: string = aoFakeResultSetRow[7].toString();
+			const amapResultSetColumnMetadata: any = JSON.parse(sResultSetColumnMetadataJSON);
 
-sSQL = "{fn teradata_lobselect(S)}{fn teradata_fake_result_sets}select * from voltab order by 1";
-console.log(sSQL);
-cur.execute(sSQL);
+			cur.nextset();
+			const aoRealResultSetRow: Row = cur.fetchone();
 
-const aoFakeResultSetRow: Row = cur.fetchone();
+			if (aoRealResultSetRow) {
+				for (let iColumn: number = 0; iColumn < aoRealResultSetRow.length; iColumn++) {
+					let oValue = aoRealResultSetRow[iColumn];
+					const sTypeName: string = amapResultSetColumnMetadata[iColumn]["TypeName"];
 
-if (aoFakeResultSetRow) {
-    const sResultSetColumnMetadataJSON: string = aoFakeResultSetRow[7].toString();
-    const amapResultSetColumnMetadata: any = JSON.parse(sResultSetColumnMetadataJSON);
-
-    cur.nextset();
-    const aoRealResultSetRow: Row = cur.fetchone();
-
-    if (aoRealResultSetRow) {
-        for (let iColumn: number = 0; iColumn < aoRealResultSetRow.length; iColumn++) {
-            let oValue = aoRealResultSetRow[iColumn];
-            const sTypeName: string = amapResultSetColumnMetadata[iColumn]["TypeName"];
-
-            if (sTypeName.startsWith("LOCATOR(")) {
-                oValue = ReadLobValueFromLobLocator(con, oValue, sTypeName);
-            }
-            console.log(`Column ${iColumn + 1} ${sTypeName} value: ${oValue}`);
-        }
-    }
+					if (sTypeName.startsWith("LOCATOR(")) {
+						oValue = ReadLobValueFromLobLocator(con, oValue, sTypeName);
+					}
+					console.log(`Column ${iColumn + 1} ${sTypeName} value: ${oValue}`);
+				}
+			}
+		}
+	} finally {
+		cur.close();
+	}
+} finally {
+	con.close();
 }
-
-cur.close();
-con.close();

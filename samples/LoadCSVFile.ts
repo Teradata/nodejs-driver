@@ -9,28 +9,29 @@
 import * as fs from "fs";
 import { parse } from "csv-parse/sync";
 // @ts-ignore
-import { TeradataConnection, TeradataCursor } from "teradatasql";
+import * as teradatasql from "teradatasql";
 
-const con: TeradataConnection = new TeradataConnection();
+const con: teradatasql.TeradataConnection = teradatasql.connect({ host: "whomooz", user: "guest", password: "please" });
+try {
+	const cur: teradatasql.TeradataCursor = con.cursor();
+	try {
+		cur.execute("create volatile table Airports (City varchar(100), Airport varchar(100), AirportCode varchar(10)) on commit preserve rows");
 
-con.connect({ host: "whomooz", user: "guest", password: "please" });
+		console.log("Slower approach - use the csv module to parse data values from a CSV file");
+		const records: string[][] = parse(fs.readFileSync("airports.csv", { encoding: "utf-8" }));
+		cur.execute("insert into Airports (?, ?, ?)", records);
+		cur.execute("select AirportCode, Airport, City from Airports order by AirportCode");
+		console.log(cur.fetchall());
 
-const cur: TeradataCursor = con.cursor();
+		cur.execute("delete from Airports");
 
-cur.execute("create volatile table Airports (City varchar(100), Airport varchar(100), AirportCode varchar(10)) on commit preserve rows");
-
-console.log("Slower approach - use a cvs module to parse data values from a CSV file");
-const records: string[][] = parse(fs.readFileSync("airports.csv", { encoding: "utf-8" }));
-cur.execute("insert into Airports (?, ?, ?)", records);
-cur.execute("select AirportCode, Airport, City from Airports order by AirportCode");
-console.log(cur.fetchall());
-
-cur.execute("delete from Airports");
-
-console.log("Faster approach - the driver loads data values from a CSV file");
-cur.execute("{fn teradata_read_csv(airports.csv)}insert into Airports (?, ?, ?)");
-cur.execute("select AirportCode, Airport, City from Airports order by AirportCode");
-console.log(cur.fetchall());
-
-cur.close();
-con.close();
+		console.log("Faster approach - the driver loads data values from a CSV file");
+		cur.execute("{fn teradata_read_csv(airports.csv)}insert into Airports (?, ?, ?)");
+		cur.execute("select AirportCode, Airport, City from Airports order by AirportCode");
+		console.log(cur.fetchall());
+	} finally {
+		cur.close();
+	}
+} finally {
+	con.close();
+}
