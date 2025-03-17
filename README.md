@@ -2,7 +2,7 @@
 
 This package enables Node.js applications to connect to the Teradata Database.
 
-This package requires 64-bit Node.js 16.20.2 or later and runs on the following operating systems and processor architectures. 32-bit Node.js is not supported.
+This package requires 64-bit Node.js v18.20.7 or later and runs on the following operating systems and processor architectures. 32-bit Node.js is not supported.
 * Windows x64 on 64-bit Intel and AMD processors
 * macOS on 64-bit ARM processors
 * macOS on 64-bit Intel processors
@@ -1623,6 +1623,15 @@ SQL requests can be executed after a database connection is established.
 <a id="ChangeLog"></a>
 
 ### Change Log
+
+`20.0.26` - March 17, 2025
+* Vector data type support for FastLoad
+* Build DLL and shared library with standard Go 1.24.1
+* Environment variable GODEBUG=fips140=on directs the Go Cryptographic Module to operate in FIPS 140-3 mode, default is off
+* No longer uses OpenSSL on Linux, to avoid panic: opensslcrypto: FIPS mode requested (system FIPS mode) but not available in OpenSSL
+* client attribute ClientSecProdGrp no longer indicates OpenSSL library on Linux
+* Switch to golang.org/x/crypto version 0.36.0
+* Requires Node.js v18.20.7 or later and ends support for older versions of Node.js
 
 `20.0.25` - February 25, 2025
 * FIPS support
