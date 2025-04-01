@@ -7,75 +7,75 @@
 import * as teradatasql from "teradatasql";
 
 function DisplayResults(cur: teradatasql.TeradataCursor): void {
-	while (true) {
-		console.log(" === metadata ===");
-		console.log("  cur.rowcount:", cur.rowcount);
-		console.log("  cur.description:", cur.description);
+    while (true) {
+        console.log(" === metadata ===");
+        console.log("  cur.rowcount:", cur.rowcount);
+        console.log("  cur.description:", cur.description);
 
-		console.log(" === result ===");
-		console.log(cur.fetchall());
-		if (!cur.nextset()) {
-			break;
-		}
-	}
+        console.log(" === result ===");
+        console.log(cur.fetchall());
+        if (!cur.nextset()) {
+            break;
+        }
+    }
 }
 
 function cur_execute(cur: teradatasql.TeradataCursor, sSQL: string, params?: any[]): void {
-	console.log();
-	console.log("cur.execute", sSQL, "bound values", params);
-	cur.execute(sSQL, params);
-	DisplayResults(cur);
+    console.log();
+    console.log("cur.execute", sSQL, "bound values", params);
+    cur.execute(sSQL, params);
+    DisplayResults(cur);
 }
 
 function cur_callproc(cur: teradatasql.TeradataCursor, sProcName: string, params?: any[]): void {
-	console.log();
-	console.log("cur.callproc", sProcName, "bound values", params);
-	cur.callproc(sProcName, params); // OUT parameters are not supported by .callproc
-	DisplayResults(cur);
+    console.log();
+    console.log("cur.callproc", sProcName, "bound values", params);
+    cur.callproc(sProcName, params); // OUT parameters are not supported by .callproc
+    DisplayResults(cur);
 }
 
 const con: teradatasql.TeradataConnection = teradatasql.connect({ host: "whomooz", user: "guest", password: "please" });
 try {
-	const cur: teradatasql.TeradataCursor = con.cursor();
-	try {
-		// Demonstrate a stored procedure having IN and INOUT parameters.
-		// Returns one result set having one row and one column containing the output parameter value.
+    const cur: teradatasql.TeradataCursor = con.cursor();
+    try {
+        // Demonstrate a stored procedure having IN and INOUT parameters.
+        // Returns one result set having one row and one column containing the output parameter value.
 
-		cur.execute("replace procedure examplestoredproc (in p1 integer, inout p2 integer) begin set p2 = p1 + p2 ; end ;");
+        cur.execute("replace procedure examplestoredproc (in p1 integer, inout p2 integer) begin set p2 = p1 + p2 ; end ;");
 
-		try {
-			cur_execute(cur, "{call examplestoredproc (3, 5)}"); // literal parameter values
-			cur_execute(cur, "{call examplestoredproc (?, ?)}", [10, 7]); // bound parameter values
-			cur_callproc(cur, "examplestoredproc", [20, 4]); // bound parameter values
+        try {
+            cur_execute(cur, "{call examplestoredproc (3, 5)}"); // literal parameter values
+            cur_execute(cur, "{call examplestoredproc (?, ?)}", [10, 7]); // bound parameter values
+            cur_callproc(cur, "examplestoredproc", [20, 4]); // bound parameter values
 
-			// Demonstrate a stored procedure having one OUT parameter.
-			// Returns one result set having one row and one column containing the output parameter value.
-			// Only demonstrate .execute because OUT parameters are not supported by .callproc
-			// OUT parameters must be unbound.
+            // Demonstrate a stored procedure having one OUT parameter.
+            // Returns one result set having one row and one column containing the output parameter value.
+            // Only demonstrate .execute because OUT parameters are not supported by .callproc
+            // OUT parameters must be unbound.
 
-			cur.execute("replace procedure examplestoredproc (out p1 varchar(100)) begin set p1 = 'foobar' ; end ;");
-			cur_execute(cur, "{call examplestoredproc (?)}");
+            cur.execute("replace procedure examplestoredproc (out p1 varchar(100)) begin set p1 = 'foobar' ; end ;");
+            cur_execute(cur, "{call examplestoredproc (?)}");
 
-			// Demonstrate a stored procedure having no parameters that returns one dynamic result set.
-			// Returns two result sets.
-			// The first result set is empty having no rows or columns, because there are no output parameter values.
-			// The second result set is the dynamic result set returned by the stored procedure.
+            // Demonstrate a stored procedure having no parameters that returns one dynamic result set.
+            // Returns two result sets.
+            // The first result set is empty having no rows or columns, because there are no output parameter values.
+            // The second result set is the dynamic result set returned by the stored procedure.
 
-			cur.execute(`replace procedure examplestoredproc ()
+            cur.execute(`replace procedure examplestoredproc ()
 						dynamic result sets 1
 						begin
 							declare cur1 cursor with return for select * from dbc.dbcinfo order by 1 ;
 							open cur1 ;
 						end ;`);
-			cur_execute(cur, "{call examplestoredproc}");
-			cur_callproc(cur, "examplestoredproc");
+            cur_execute(cur, "{call examplestoredproc}");
+            cur_callproc(cur, "examplestoredproc");
 
-			// Demonstrate a stored procedure having IN and INOUT parameters that returns two dynamic result sets.
-			// Returns three result sets.
-			// The first result set has one row and one column containing the output parameter values.
-			// The second and third result sets are dynamic result sets returned by the stored procedure.
+            // Demonstrate a stored procedure having IN and INOUT parameters that returns two dynamic result sets.
+            // Returns three result sets.
+            // The first result set has one row and one column containing the output parameter values.
+            // The second and third result sets are dynamic result sets returned by the stored procedure.
 
-			cur.execute(`replace procedure examplestoredproc (in p1 integer, inout p2 integer, inout p3 integer)
+            cur.execute(`replace procedure examplestoredproc (in p1 integer, inout p2 integer, inout p3 integer)
 					dynamic result sets 2
 					begin
 						declare cur1 cursor with return for select * from dbc.dbcinfo order by 1 ;
@@ -85,18 +85,18 @@ try {
 						set p2 = p1 + p2 ;
 						set p3 = p1 * p3 ;
 					end ;`);
-			cur_execute(cur, "{call examplestoredproc (2, 1, 3)}"); // literal parameter values
-			cur_execute(cur, "{call examplestoredproc (?, ?, ?)}", [3, 2, 4]); // bound IN and INOUT parameter values
-			cur_callproc(cur, "examplestoredproc", [10, 3, 2]); // bound IN and INOUT parameter values
+            cur_execute(cur, "{call examplestoredproc (2, 1, 3)}"); // literal parameter values
+            cur_execute(cur, "{call examplestoredproc (?, ?, ?)}", [3, 2, 4]); // bound IN and INOUT parameter values
+            cur_callproc(cur, "examplestoredproc", [10, 3, 2]); // bound IN and INOUT parameter values
 
-			// Demonstrate a stored procedure having IN, INOUT, and OUT parameters that returns two dynamic result sets.
-			// Returns three result sets.
-			// The first result set has one row and two columns containing the output values from the INOUT and OUT parameters.
-			// The second and third result sets are dynamic result sets returned by the stored procedure.
-			// Only demonstrate .execute because OUT parameters are not supported by .callproc
-			// OUT parameters must be unbound.
+            // Demonstrate a stored procedure having IN, INOUT, and OUT parameters that returns two dynamic result sets.
+            // Returns three result sets.
+            // The first result set has one row and two columns containing the output values from the INOUT and OUT parameters.
+            // The second and third result sets are dynamic result sets returned by the stored procedure.
+            // Only demonstrate .execute because OUT parameters are not supported by .callproc
+            // OUT parameters must be unbound.
 
-			cur.execute(`replace procedure examplestoredproc (in p1 integer, inout p2 integer, out p3 varchar(100))
+            cur.execute(`replace procedure examplestoredproc (in p1 integer, inout p2 integer, out p3 varchar(100))
 						dynamic result sets 2
 						begin
 							declare cur1 cursor with return for select * from dbc.dbcinfo order by 1 desc ;
@@ -106,14 +106,14 @@ try {
 							set p2 = p1 + p2 ;
 							set p3 = 'hello' ;
 						end ;`);
-			cur_execute(cur, "{call examplestoredproc (10, 5, ?)}"); // literal parameter values
-			cur_execute(cur, "{call examplestoredproc (?, ?, ?)}", [20, 7]); // bound IN and INOUT parameter values
-		} finally {
-			cur.execute("drop procedure examplestoredproc");
-		}
-	} finally {
-		cur.close();
-	}
+            cur_execute(cur, "{call examplestoredproc (10, 5, ?)}"); // literal parameter values
+            cur_execute(cur, "{call examplestoredproc (?, ?, ?)}", [20, 7]); // bound IN and INOUT parameter values
+        } finally {
+            cur.execute("drop procedure examplestoredproc");
+        }
+    } finally {
+        cur.close();
+    }
 } finally {
-	con.close();
+    con.close();
 }

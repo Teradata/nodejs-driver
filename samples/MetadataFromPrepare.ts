@@ -11,28 +11,28 @@ type Row = any[] | null;
 
 const con: teradatasql.TeradataConnection = teradatasql.connect({ host: "whomooz", user: "guest", password: "please" });
 try {
-	const cur: teradatasql.TeradataCursor = con.cursor();
-	try {
-		cur.execute("{fn teradata_rpo(S)}{fn teradata_fake_result_sets}select * from dbc.dbcinfo where infokey=?");
-		const row: Row = cur.fetchone();
+    const cur: teradatasql.TeradataCursor = con.cursor();
+    try {
+        cur.execute("{fn teradata_rpo(S)}{fn teradata_fake_result_sets}select * from dbc.dbcinfo where infokey=?");
+        const row: Row = cur.fetchone();
 
-		if (row && cur.description) {
-			console.log("SQL statement metadata from prepare operation:");
-			console.log();
+        if (row && cur.description) {
+            console.log("SQL statement metadata from prepare operation:");
+            console.log();
 
-			for (let i: number = 0; i < cur.description.length; i++) {
-				console.log(`   Column [${i}] ${cur.description[i][0].padEnd(18)} : ${row[i]}`);
-			}
+            for (let i: number = 0; i < cur.description.length; i++) {
+                console.log(`   Column [${i}] ${cur.description[i][0].padEnd(18)} : ${row[i]}`);
+            }
 
-			console.log("Result set column metadata as JSON:");
-			console.log(JSON.parse(row[7]));
-			console.log();
-			console.log("Parameter marker metadata as JSON:");
-			console.log(JSON.parse(row[8]));
-		}
-	} finally {
-		cur.close();
-	}
+            console.log("Result set column metadata as JSON:");
+            console.log(JSON.parse(row[7]));
+            console.log();
+            console.log("Parameter marker metadata as JSON:");
+            console.log(JSON.parse(row[8]));
+        }
+    } finally {
+        cur.close();
+    }
 } finally {
-	con.close();
+    con.close();
 }

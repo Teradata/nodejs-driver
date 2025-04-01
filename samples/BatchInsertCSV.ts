@@ -11,38 +11,38 @@ import * as teradatasql from "teradatasql";
 
 const con: teradatasql.TeradataConnection = teradatasql.connect({ host: "whomooz", user: "guest", password: "please" });
 try {
-	const cur: teradatasql.TeradataCursor = con.cursor();
-	try {
-		cur.execute("create volatile table voltab (c1 integer, c2 varchar(100)) on commit preserve rows");
+    const cur: teradatasql.TeradataCursor = con.cursor();
+    try {
+        cur.execute("create volatile table voltab (c1 integer, c2 varchar(100)) on commit preserve rows");
 
-		const records: string[][] = [
-			["c1", "c2"],
-			["1", ""],
-			["2", "abc"],
-			["3", "def"],
-			["4", "mno"],
-			["5", ""],
-			["6", "pqr"],
-			["7", "uvw"],
-			["8", "xyz"],
-			["9", ""],
-		];
+        const records: string[][] = [
+            ["c1", "c2"],
+            ["1", ""],
+            ["2", "abc"],
+            ["3", "def"],
+            ["4", "mno"],
+            ["5", ""],
+            ["6", "pqr"],
+            ["7", "uvw"],
+            ["8", "xyz"],
+            ["9", ""],
+        ];
 
-		const sFileName: string = "CSVBatchInsertData_js";
-		fs.writeFileSync(sFileName, stringify(records));
+        const sFileName: string = "CSVBatchInsertData_js";
+        fs.writeFileSync(sFileName, stringify(records));
 
-		try {
-			console.log("Inserting data");
-			cur.execute(`{fn teradata_read_csv(${sFileName})} insert into voltab (?, ?)`);
-		} finally {
-			fs.unlinkSync(sFileName);
-		}
+        try {
+            console.log("Inserting data");
+            cur.execute(`{fn teradata_read_csv(${sFileName})} insert into voltab (?, ?)`);
+        } finally {
+            fs.unlinkSync(sFileName);
+        }
 
-		cur.execute("select * from voltab order by 1");
-		console.log(cur.fetchall());
-	} finally {
-		cur.close();
-	}
+        cur.execute("select * from voltab order by 1");
+        console.log(cur.fetchall());
+    } finally {
+        cur.close();
+    }
 } finally {
-	con.close();
+    con.close();
 }

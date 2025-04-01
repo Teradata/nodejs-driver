@@ -11,24 +11,26 @@ type Row = any[] | null;
 
 const con: teradatasql.TeradataConnection = teradatasql.connect({ host: "whomooz", user: "guest", password: "please" });
 try {
-	const cur: teradatasql.TeradataCursor = con.cursor();
-	try {
-		console.log("Create function");
-		cur.execute("create function myudfinc(integer) returns integer language c no sql parameter style sql external name 'CS!udfinc!udfinc.c!F!udfinc'");
+    const cur: teradatasql.TeradataCursor = con.cursor();
+    try {
+        console.log("Create function");
+        cur.execute(
+            "create function myudfinc(integer) returns integer language c no sql parameter style sql external name 'CS!udfinc!udfinc.c!F!udfinc'"
+        );
 
-		console.log("Execute function");
-		cur.execute("select myudfinc(1)");
+        console.log("Execute function");
+        cur.execute("select myudfinc(1)");
 
-		const row: Row = cur.fetchone();
-		if (row) {
-			console.log("Function returned", row[0]);
-		}
+        const row: Row = cur.fetchone();
+        if (row) {
+            console.log("Function returned", row[0]);
+        }
 
-		console.log("Drop function");
-		cur.execute("drop function myudfinc");
-	} finally {
-		cur.close();
-	}
+        console.log("Drop function");
+        cur.execute("drop function myudfinc");
+    } finally {
+        cur.close();
+    }
 } finally {
-	con.close();
+    con.close();
 }
