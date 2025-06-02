@@ -1639,6 +1639,9 @@ SQL requests can be executed after a database connection is established.
 
 ### Change Log
 
+`20.0.31` - June 2, 2025
+* Build DLL and shared library with standard Go 1.24.3
+
 `20.0.30` - April 25, 2025
 * GOSQL-32 DBCCONS partition
 
