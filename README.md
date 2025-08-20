@@ -1699,6 +1699,9 @@ SQL requests can be executed after a database connection is established.
 
 ### Change Log
 
+`20.0.36` - August 20, 2025
+* GOSQL-237 Avoid error for missing file /proc/sys/crypto/fips_enabled
+
 `20.0.35` - August 19, 2025
 * GOSQL-228 Windows automatic FIPS mode
 * GOSQL-229 Linux x64 and ARM automatic FIPS mode
