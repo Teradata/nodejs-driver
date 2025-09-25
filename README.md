@@ -97,8 +97,6 @@ At the present time, the driver offers the following features.
 
 ### Installation
 
-The driver depends on the `ffi-napi`, `ref-napi`, `ref-array-di` packages which are available from [npmjs.com](http://www.npmjs.com).
-
 Use `npm install teradatasql` to download and install the driver and its dependencies automatically.
 
 <a id="License"></a>
@@ -266,7 +264,7 @@ Parameter               | Default     | Type           | Description
 `partition`             | `"DBC/SQL"` | string         | Specifies the database partition. Equivalent to the Teradata JDBC Driver `PARTITION` connection parameter.
 `password`              |             | string         | Specifies the database password. Equivalent to the Teradata JDBC Driver `PASSWORD` connection parameter.
 `proxy_bypass_hosts`    |             | string         | Specifies a matching pattern for hostnames and addresses to bypass the proxy server identified by the `http_proxy` and/or `https_proxy` parameter. This parameter may only be specified in conjunction with the `http_proxy` and/or `https_proxy` parameter. Separate multiple hostnames and addresses with a vertical bar `\|` character. Specify an asterisk `*` as a wildcard character. When this parameter is omitted, the default pattern `localhost\|127.*\|[::1]` bypasses the proxy server identified by the `http_proxy` and/or `https_proxy` parameter for common variations of the loopback address. Equivalent to the Teradata JDBC Driver `PROXY_BYPASS_HOSTS` connection parameter.
-`request_timeout`       | `"0"`       | quoted integer | Specifies the timeout for executing each SQL request. Zero means no timeout.
+`request_timeout`       | `"0"`       | quoted integer | Specifies the timeout in seconds for executing each SQL request. Zero means no timeout.
 `runstartup`            | `"false"`   | quoted boolean | Controls whether the user's `STARTUP` SQL request is executed after logon. For more information, refer to [User STARTUP SQL Request](#UserStartup). Equivalent to the Teradata JDBC Driver `RUNSTARTUP` connection parameter.
 `sessions`              |             | quoted integer | Specifies the number of data transfer connections for FastLoad or FastExport. The default (recommended) lets the database choose the appropriate number of connections. Equivalent to the Teradata JDBC Driver `SESSIONS` connection parameter.
 `sip_support`           | `"true"`    | quoted boolean | Controls whether StatementInfo parcel is used. Equivalent to the Teradata JDBC Driver `SIP_SUPPORT` connection parameter.
@@ -1094,6 +1092,16 @@ Read-only attribute consisting of a sequence of seven-item sequences that each d
 
 Read-only `BigInt` attribute indicating the number of rows returned from, or affected by, the current SQL statement.
 
+---
+
+`.isAsyncExec`
+
+Read-only `boolean` attribute indicating whether the cursor is currently executing an asynchronous SQL request via `.executeAsync()` or `.executemanyAsync()`.
+
+**Important Usage Note:** This attribute reflects the current state of the cursor at the time it's read. However, checking this attribute does not guarantee that subsequent operations will succeed, because another cursor on the same connection might be executing an async operation.
+
+---
+
 <a id="CursorMethods"></a>
 
 ### Cursor Methods
@@ -1124,8 +1132,12 @@ If a sequence of parameter values is provided as the second argument, the values
 
 `.executeAsync(` *SQLRequest* `,` *OptionalSequenceOfParameterValues* `, ignoreErrors=` *OptionalSequenceOfIgnoredErrorCodes* `)`
 
-Asynchronously executes the SQL request. Returns a `Promise`.
+Asynchronously executes the SQL request and returns a `Promise<void>` that resolves when the SQL request execution is complete.
 If a sequence of parameter values is provided as the second argument, the values will be bound to question-mark parameter markers in the SQL request. Specifying parameter values as a mapping is not supported.
+
+The asynchronous execution allows other operations to proceed while the SQL request is being processed by the database. During execution, the cursor's `.isAsyncExec` property will return `true`.
+
+The `ignoreErrors` parameter is optional. The ignored error codes must be specified as a sequence of integers.
 
 ---
 
@@ -1140,10 +1152,46 @@ The `ignoreErrors` parameter is optional. The ignored error codes must be specif
 
 `.executemanyAsync(` *SQLRequest* `,` *SequenceOfSequencesOfParameterValues* `, ignoreErrors=` *OptionalSequenceOfIgnoredErrorCodes* `)`
 
-Asynchronously executes the SQL request as an iterated SQL request for the batch of parameter values. Returns a `Promise`.
+Asynchronously executes the SQL request as an iterated SQL request for the batch of parameter values and returns a `Promise<void>` that resolves when the batch SQL request execution is complete.
 The batch of parameter values must be specified as a sequence of sequences. Specifying parameter values as a mapping is not supported.
 
+The asynchronous execution allows other operations to proceed while the SQL requests are being processed by the database. During execution, the cursor's `.isAsyncExec` property will return `true`.
+
 The `ignoreErrors` parameter is optional. The ignored error codes must be specified as a sequence of integers.
+
+#### Async Execution Error Codes
+
+You may encounter specific error codes related to concurrent SQL execution when using **any cursor methods** (`.execute()`, `.executemany()`, `.executeAsync()`, `.executemanyAsync()`, `.close()`, etc.) if an asynchronous operation is already in progress on the same cursor or connection:
+
+* **Error 701**: "A SQL request is still executing. Please submit the new request later."
+  - Occurs when attempting to execute a new SQL request while another request is still in progress on the same cursor
+  - Can happen with `.execute()`, `.executemany()`, `.executeAsync()`, or `.executemanyAsync()` if the cursor is already executing an async operation
+  - Check the `.isAsyncExec` property before submitting new requests
+  - Thrown by the cursor's internal `_stopIfInAsyncExecute()` method
+
+* **Error 703**: "A SQL request is still executing. Please close the cursor later."
+  - Occurs when attempting to close a cursor while a SQL request is still executing on the same cursor
+  - Can happen with `.close()` if the cursor is executing an async operation
+  - Wait for the current async operation to complete before closing the cursor
+  - Thrown by the cursor's `close()` method
+
+* **Error 751**: "A SQL request is still executing. Please submit the new request later."
+  - Occurs when attempting to execute a new SQL request while another request is still in progress
+  - Can happen with any execution method if another cursor on the same connection is executing an async operation
+  - Check the `.isAsyncExec` property of all cursors before submitting new requests
+  - Thrown by the Teradata GoSQL Driver
+
+* **Error 752**: "A SQL request is still executing. Please close the connection later."
+  - Occurs when attempting to close a connection while a SQL request is still executing
+  - Can happen with `.close()` if any cursor on the connection is executing an async operation
+  - Wait for all async operations to complete before closing the connection
+  - Thrown by the Teradata GoSQL Driver
+
+* **Error 753**: "A SQL request is still executing. Please close rows later."
+  - Occurs when attempting to close result rows while a SQL request is still executing
+  - Can happen with cursor operations that close rows if an async operation is in progress
+  - Wait for the current async operation to complete before closing rows
+  - Thrown by the Teradata GoSQL Driver
 
 ---
 
@@ -1702,7 +1750,13 @@ SQL requests can be executed after a database connection is established.
 
 ### Change Log
 
-`20.0.0.40` - September 5, 2025
+
+`20.0.41` - September 25, 2025
+* Add cursor method isAsyncExec()
+* GOSQL-255 exclude from revocation checking last certificate in chain if self-signed
+* GOSQL-256 token mode
+
+`20.0.40` - September 5, 2025
 * GOSQL-243 panic recovery with stack traces for top-level APIs
 * Build DLL and shared library with Go 1.25.1
 * Build DLL with MinGW 15.2.0

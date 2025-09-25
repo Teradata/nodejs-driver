@@ -1,3 +1,5 @@
+/* Copyright 2025 by Teradata Corporation. All Rights Reserved. */
+
 #ifdef _WIN32
 #include <windows.h>
 #else
