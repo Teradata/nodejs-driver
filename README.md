@@ -1773,6 +1773,9 @@ SQL requests can be executed after a database connection is established.
 
 ### Change Log
 
+`20.0.44` - October 13, 2025
+* Build DLL and shared library with Go 1.25.2
+
 `20.0.43` - October 9, 2025
 * Documentation correction for oidc_redirect_port
 
