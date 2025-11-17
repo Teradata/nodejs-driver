@@ -1773,6 +1773,9 @@ SQL requests can be executed after a database connection is established.
 
 ### Change Log
 
+`20.0.47` - November 17, 2025
+* GOSQL-278 connection parameter ws_endpoint
+
 `20.0.46` - November 12, 2025
 * GOSQL-273 allow host=-none in token mode
 * GOSQL-277 escape function teradata_web_service
