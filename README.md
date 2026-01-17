@@ -1522,6 +1522,8 @@ Request-scope function escape clauses are removed before the SQL request text is
 Request-Scope Function                                 | Effect
 ------------------------------------------------------ | ---
 `{fn teradata_agkr(`*Option*`)}`                       | Executes the SQL request with Auto-Generated Key Retrieval (AGKR) *Option* `C` (identity column value) or `R` (entire row)
+`{fn teradata_array_transform_off}`                    | Turns off the From-SQL transform for SQL Array values for this SQL request with Request Processing Option `S` (prepare)
+`{fn teradata_array_transform_on}`                     | Turns on the From-SQL transform for SQL Array values for this SQL request (the default)
 `{fn teradata_clobtranslate(`*Option*`)}`              | Executes the SQL request with CLOB translate *Option* `U` (unlocked) or the default `L` (locked)
 `{fn teradata_error_query_count(`*Number*`)}`          | Specifies how many times the driver will attempt to query FastLoad Error Table 1 after a FastLoad operation. Takes precedence over the `error_query_count` connection parameter.
 `{fn teradata_error_query_interval(`*Milliseconds*`)}` | Specifies how many milliseconds the driver will wait between attempts to query FastLoad Error Table 1. Takes precedence over the `error_query_interval` connection parameter.
@@ -1551,6 +1553,8 @@ Request-Scope Function                                 | Effect
 `{fn teradata_sessions(`*Number*`)}`                   | Specifies the *Number* of data transfer connections for FastLoad or FastExport. Takes precedence over the `sessions` connection parameter.
 `{fn teradata_try_fastexport}`                         | Tries to use FastExport for the SQL request
 `{fn teradata_try_fastload}`                           | Tries to use FastLoad for the SQL request
+`{fn teradata_udt_transforms_off}`                     | Turns off From-SQL transforms for User Defined Type (UDT) values for this SQL request with Request Processing Option `S` (prepare)
+`{fn teradata_udt_transforms_on}`                      | Turns on From-SQL transforms for User Defined Type (UDT) values for this SQL request (the default)
 `{fn teradata_untrusted}`                              | Marks the SQL request as untrusted; not implemented yet
 `{fn teradata_values_off}`                             | Turns off `teradata_values` for this SQL request. Takes precedence over the `teradata_values` connection parameter. Refer to the [Data Types](#DataTypes) table for details.
 `{fn teradata_values_on}`                              | Turns on `teradata_values` for this SQL request. Takes precedence over the `teradata_values` connection parameter. Refer to the [Data Types](#DataTypes) table for details.
@@ -1774,6 +1778,9 @@ SQL requests can be executed after a database connection is established.
 <a id="ChangeLog"></a>
 
 ### Change Log
+
+`20.0.50` - January 16, 2026
+* GOSQL-312 escape functions teradata_array_transform_off/on and teradata_udt_transforms_off/on
 
 `20.0.49` - January 15, 2026
 * GOSQL-300 accept port range for oidc_redirect_port connection parameter
