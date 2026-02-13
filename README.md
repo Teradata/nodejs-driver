@@ -26,6 +26,7 @@ Copyright 2026 Teradata. All Rights Reserved.
 * [Documentation](#Documentation)
 * [Sample Programs](#SamplePrograms)
 * [Using the Driver](#Using)
+* [Async Connection Management](#AsyncConnectionManagement)
 * [Connection Parameters](#ConnectionParameters)
 * [FIPS Mode](#FIPSMode)
 * [COP Discovery](#COPDiscovery)
@@ -64,6 +65,7 @@ At the present time, the driver offers the following features.
 * Supported for use with Teradata database 16.20 and later releases.
 * [COP Discovery](#COPDiscovery).
 * Laddered Concurrent Connect.
+* [Non-blocking asynchronous connection operations](#AsyncConnectionManagement) with comprehensive operation enforcement.
 * [HTTPS](https://en.wikipedia.org/wiki/HTTPS)/[TLS](https://en.wikipedia.org/wiki/Transport_Layer_Security) connections with Teradata database 16.20.53.30 and later.
 * Encrypted logon.
 * [GSS-API](https://en.wikipedia.org/wiki/Generic_Security_Services_Application_Program_Interface) logon authentication methods `KRB5` (Kerberos), `LDAP`, `TD2`, and `TDNEGO`.
@@ -129,6 +131,7 @@ Program                                                                         
 -------------------------------------------------------------------------------------------------------------------- | ---
 [AGKRBatchInsert.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/AGKRBatchInsert.ts)              | Demonstrates how to insert a batch of rows with Auto-Generated Key Retrieval (AGKR)
 [AGKRInsertSelect.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/AGKRInsertSelect.ts)            | Demonstrates Insert/Select with Auto-Generated Key Retrieval (AGKR)
+[AsyncConnectClose.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/AsyncConnectClose.ts)          | Demonstrates non-blocking asynchronous connection establishment and closure using connectAsync and closeAsync
 [BatchInsert.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/BatchInsert.ts)                      | Demonstrates how to insert a batch of rows
 [BatchInsertCSV.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/BatchInsertCSV.ts)                | Demonstrates how to insert a batch of rows from a CSV file
 [BatchInsPerf.ts](https://github.com/Teradata/nodejs-driver/blob/develop/samples/BatchInsPerf.ts)                    | Measures time to insert one million rows
@@ -176,7 +179,15 @@ After importing the `teradatasql` package, your JavaScript program calls the `te
         password: "please"
     });
 
-You may specify connection parameters as a JavaScript object, as a JSON string, or using a combination of the two approaches. The `teradatasql.connect` function's first argument is a JavaScript object. The `teradatasql.connect` function's second argument is an optional JSON string.
+For asynchronous connection establishment, use the `teradatasql.connectAsync` function which returns a Promise:
+
+    const con = await teradatasql.connectAsync({
+        host: "whomooz",
+        user: "guest",
+        password: "please"
+    });
+
+You may specify connection parameters as a JavaScript object, as a JSON string, or using a combination of the two approaches. Both `teradatasql.connect` and `teradatasql.connectAsync` functions accept a JavaScript object as the first argument and an optional JSON string as the second argument.
 
 Connection parameters specified only as a JavaScript object:
 
@@ -190,7 +201,327 @@ Connection parameters specified using a combination:
 
     con = teradatasql.connect({host:"whomooz"}, '{"user":"guest", "password":"please"}');
 
+The same parameter specification approaches work with `teradatasql.connectAsync`:
+
+    con = await teradatasql.connectAsync({host:"whomooz",user:"guest",password:"please"});
+
 When a combination of parameters are specified, connection parameters specified as a JSON string take precedence over same-named connection parameters specified in the JavaScript object.
+
+<a id="AsyncConnectionManagement"></a>
+
+### Async Connection Management
+
+The driver provides non-blocking asynchronous connection operations through the `connectAsync` and `closeAsync` methods, enabling concurrent database operations without blocking the Node.js event loop.
+
+**Important Limitation:** When an async operation is in progress, ALL other operations (both sync and async) are blocked (rejected with specific error codes, not queued) on that connection. This applies to connection operations (`connectAsync`, `closeAsync`) as well as SQL execution operations (`executeAsync`, `executemanyAsync` via cursor). See [Concurrency Behavior and Limitations](#concurrency-behavior-and-limitations) below for details.
+
+#### Overview
+
+Traditional synchronous `connect()` and `close()` methods block the Node.js event loop during database connection establishment and closure. The asynchronous alternatives provide:
+
+* Non-blocking connection establishment and closure
+* Improved application responsiveness during connection operations
+* Support for concurrent connection operations across multiple database instances
+* Full backward compatibility with existing synchronous APIs
+
+#### Asynchronous Connection Establishment
+
+The `connectAsync` method establishes a database connection asynchronously using the `async`/`await` pattern:
+
+```javascript
+const teradatasql = require("teradatasql");
+
+async function connectToDatabase() {
+    const con = new teradatasql.TeradataConnection();
+    await con.connectAsync({
+        host: "whomooz",
+        user: "guest",
+        password: "please"
+    });
+    
+    // Connection is now ready for use
+    const cursor = con.cursor();
+    cursor.execute("SELECT * FROM DBC.DBCInfo");
+    const rows = cursor.fetchall();
+    console.log(rows);
+    
+    await con.closeAsync();
+}
+
+connectToDatabase().catch(console.error);
+```
+
+Like the synchronous `connect` method, `connectAsync` accepts connection parameters as a JavaScript object, a JSON string, or a combination of both:
+
+```javascript
+// Parameters as JavaScript object
+await con.connectAsync({host:"whomooz", user:"guest", password:"please"});
+
+// Parameters as JSON string
+await con.connectAsync({}, '{"host":"whomooz", "user":"guest", "password":"please"}');
+
+// Parameters as combination
+await con.connectAsync({host:"whomooz"}, '{"user":"guest", "password":"please"}');
+```
+
+#### Timeout Behavior
+
+The `connectAsync` method respects the `logon_timeout` connection parameter with  timeout handling.
+
+**Important:** When `logon_timeout` is not specified, it defaults to `"0"` (per driver documentation).
+
+**Two Timeout Scenarios:**
+
+1. **Not specified OR "0"** (default behavior): Uses **5-minute extended timeout**
+   - When `logon_timeout` is omitted, it defaults to `"0"`
+   - Honors user intent of "long wait acceptable"
+   - Provides safety timeout to prevent infinite hangs
+   - Note: Synchronous `connect()` with default/`"0"` waits indefinitely; asynchronous `connectAsync()` uses 5 minutes as a safety timeout
+   ```javascript
+   // Not specified (defaults to "0")
+   await con.connectAsync({
+       host: "localhost",
+       user: "dbc",
+       password: "dbc"
+       // No logon_timeout -> defaults to "0" -> 5 minute extended timeout
+   });
+   
+   // Explicitly set to "0" (same as default)
+   await con.connectAsync({
+       host: "localhost",
+       user: "dbc",
+       password: "dbc",
+       logon_timeout: "0"  // Explicit "0" -> 5 minute extended timeout
+   });
+   ```
+
+2. **Positive value specified**: Uses **specified timeout + 5-second buffer**
+   - Buffer ensures server-side timeout triggers before client-side timeout
+   - Provides cleaner error messages from database driver
+   ```javascript
+   await con.connectAsync({
+       host: "localhost",
+       user: "dbc",
+       password: "dbc",
+       logon_timeout: "60"  // 60s server timeout + 5s buffer = 65s client timeout
+   });
+   ```
+
+**Dual-Layer Timeout Protection:**
+- **Server-side**: Go driver's `context.WithTimeout()` governs the actual database connection
+- **Client-side**: TypeScript polling loop prevents infinite waiting
+- Whichever timeout is shorter takes precedence
+
+#### Asynchronous Connection Closure
+
+The `closeAsync` method closes a database connection asynchronously:
+
+```javascript
+await con.closeAsync();
+```
+
+#### Concurrency Behavior and Limitations
+
+**Critical Limitation:** When **ANY** asynchronous operation is in progress, **ALL other operations** (both sync and async) are blocked (rejected with specific error codes, not queued) on that connection. This applies to:
+- `connectAsync()` / `closeAsync()` / `executeAsync()` / `executemanyAsync()` (via cursor) - When running, blocks ALL operations on that connection
+
+**What This Means:**
+- During async operation: Cannot start another async operation OR perform sync operations (Error 801/802/803/804)
+- Operations are immediately rejected with error codes, not queued for later execution
+- Must wait for async operation to complete before ANY other operation on that connection
+
+**Example of sequential async operations (correct):**
+
+```javascript
+const con = new teradatasql.TeradataConnection();
+await con.connectAsync({host:"whomooz", user:"guest", password:"please"});
+
+// Perform async SQL execution - wait for completion
+const cursor = con.cursor();
+await cursor.executeAsync("SELECT * FROM MyTable");
+const rows = cursor.fetchall();
+cursor.close();
+
+// Now safe to close asynchronously
+await con.closeAsync();
+```
+
+**Concurrent async operations across different connections are supported:**
+
+```javascript
+// This is valid - different connections can have concurrent async operations
+const con1 = new teradatasql.TeradataConnection();
+const con2 = new teradatasql.TeradataConnection();
+
+await Promise.all([
+    con1.connectAsync({host:"database1", user:"guest", password:"please"}),
+    con2.connectAsync({host:"database2", user:"guest", password:"please"})
+]);
+```
+
+#### Error Handling
+
+The async connection methods provide enhanced error handling with specific error codes. The driver uses a dual-layer validation approach:
+- **TypeScript layer (801, 802, 803, 804)**: Primary validation you will typically encounter. Catches operation conflicts at the object level before they reach the Go layer.
+- **Go layer (750-752, 760-765)**: Defense-in-depth backup validation. Provides additional safety checks at the native code level.
+
+In normal usage, you will see TypeScript layer errors (801, 802, 803, 804) because they catch conflicts first. Go layer errors (750-752, 760-765) serve as a safety net.
+
+**Error Code Reference:**
+
+#### User-Facing Errors (TypeScript Layer)
+
+**You will typically see these errors** during async operation conflicts. The TypeScript layer validates operations before calling the Go layer.
+
+| Code | Scenario | What's Blocked | What's In Progress |
+|------|----------|----------------|-------------------|
+| **801** | Same cursor async blocks operations | Any operation on same cursor | executeAsync/executemanyAsync on this cursor |
+| **802** | Different cursor async blocks operations | New cursor creation or cursor operations | executeAsync/executemanyAsync on another cursor |
+| **803** | Connection async blocks operations | Cursor operations (sync/async) or another connection async | connectAsync/closeAsync |
+| **804** | Cursor async blocks connection async | Connection async operations (connectAsync/closeAsync) | executeAsync/executemanyAsync on a cursor |
+
+#### Internal Validation Errors (Go Layer - Defense-in-Depth)
+
+> **Note:** These Go layer errors provide backup validation but are rarely encountered in practice. The TypeScript layer catches operation conflicts first (errors 801, 802, 803, 804). These are documented for completeness and technical transparency.
+
+**SQL Execution Conflict Errors (750-759 range)**
+
+| Error Code | Description | TypeScript Equivalent | Notes |
+|------------|-------------|----------------------|-------|
+| **750** | SQL request still executing - submit request later | 801 | TypeScript catches first |
+| **751** | SQL request still executing - close connection later | 801 | TypeScript catches first |
+| **752** | SQL request still executing - close rows later | 801 | TypeScript catches first |
+
+**Async Connection Validation Errors (760-769 range)**
+
+| Error Code | Description | TypeScript Equivalent | Notes |
+|------------|-------------|----------------------|-------|
+| **760** | Invalid zero connection handle | N/A | Should not occur |
+| **761** | Handle not valid or not associated with async operation | N/A | Should not occur |
+| **762** | Invalid connection state detected | N/A | Should not occur |
+| **763** | Synchronous operation blocked by async operation | 803 | TypeScript catches first |
+| **764** | Invalid connection close state detected | N/A | Should not occur |
+| **765** | Async connection close in progress - operation blocked | 803 | TypeScript catches first |
+
+All error messages follow this format:
+```
+[Error <code>] [SQLState HY000] <description>
+```
+
+#### Timeout Protection
+
+Both `connectAsync` and `closeAsync` include client-side timeout protection to prevent indefinite polling loops:
+
+**`connectAsync()` Timeout:**
+* **When `logon_timeout` not specified or `"0"` (default):** 5 minutes (300 seconds)
+  * Compromise between honoring "long wait acceptable" intent and preventing infinite hangs
+  * Note: Synchronous `connect()` waits indefinitely with default/`"0"`, but async operations need safety timeout
+* **When `logon_timeout` > 0:** User-specified timeout + 5-second buffer
+  * Example: `logon_timeout="60"` results in 65-second client-side timeout
+  * Buffer ensures server-side timeout triggers first for cleaner error messages
+
+**`closeAsync()` Timeout:**
+* **Fixed 30-second timeout** for all close operations
+* Close operations typically complete quickly, so 30 seconds is generous
+
+**Polling Interval (Both Methods):**
+* **100 milliseconds** - How frequently the driver checks operation completion status
+
+**What the Timeout Does:**
+The timeout is client-side protection only. It controls how long the TypeScript layer waits for the Go layer to complete the operation, but does not affect the database server timeout. When exceeded, an `OperationalError` is thrown and the connection handle is cleaned up.
+
+#### Migration from Synchronous to Asynchronous
+
+Migrating from synchronous to asynchronous connection methods is straightforward:
+
+**Before (Synchronous):**
+```javascript
+const con = teradatasql.connect({host:"whomooz", user:"guest", password:"please"});
+// ... operations ...
+con.close();
+```
+
+**After (Asynchronous):**
+```javascript
+const con = new teradatasql.TeradataConnection();
+await con.connectAsync({host:"whomooz", user:"guest", password:"please"});
+// ... operations ...
+await con.closeAsync();
+```
+
+#### Common Pitfalls and Troubleshooting
+
+**Missing await Keywords**
+
+Forgetting `await` causes silent failures. Always await async operations:
+
+```javascript
+// Wrong - operation not awaited
+con.connectAsync({host:"whomooz", user:"guest", password:"please"});
+
+// Correct
+await con.connectAsync({host:"whomooz", user:"guest", password:"please"});
+```
+
+**Concurrent Operations on Same Connection**
+
+Error 801, 802, 803, or 804 indicates an async operation is already in progress. Wait for completion before starting another operation:
+
+```javascript
+// Wrong - trying to use cursor while async operation executes
+cursor1.executeAsync("SELECT * FROM Table1"); // No await - returns immediately
+cursor1.fetchall(); // Error 801 - cursor1 async still executing
+
+// Wrong - starting another cursor operation on same connection
+const cursor1 = con.cursor();
+const cursor2 = con.cursor();
+cursor1.executeAsync("SELECT * FROM Table1"); // No await
+cursor2.execute("SELECT * FROM Table2"); // Error 802 - cursor1 async still executing
+
+// Correct - sequential operations with proper await
+await cursor1.executeAsync("SELECT * FROM Table1");
+cursor1.fetchall();
+cursor1.close();
+await cursor2.executeAsync("SELECT * FROM Table2");
+cursor2.fetchall();
+cursor2.close();
+```
+
+**Connection Not Closed Properly**
+
+Always close connections in finally blocks to prevent resource leaks:
+
+```javascript
+const con = new teradatasql.TeradataConnection();
+try {
+    await con.connectAsync({host:"whomooz", user:"guest", password:"please"});
+    // ... operations ...
+} finally {
+    await con.closeAsync();
+}
+```
+
+**Timeout Issues**
+
+If connections timeout unexpectedly, check `logon_timeout` parameter. Default `"0"` uses 5-minute timeout for async operations. Specify explicit timeout if needed:
+
+```javascript
+await con.connectAsync({
+    host:"whomooz",
+    user:"guest",
+    password:"please",
+    logon_timeout:"60"  // 60 second timeout
+});
+```
+
+**Error Code Reference**
+
+Common async operation error codes:
+- **801**: Cursor async operation in progress - wait for completion
+- **802**: Another cursor has async operation - wait for completion
+- **803**: Connection async operation in progress - wait for completion
+- **804**: Cursor async blocks connection async - wait for completion
+- **750-765**: Go layer validation errors - see error message for details
 
 <a id="ConnectionParameters"></a>
 
@@ -266,6 +597,9 @@ Parameter               | Default     | Type           | Description
 `partition`             | `"DBC/SQL"` | string         | <a id="cp_partition"></a>             Specifies the database partition. Equivalent to the Teradata JDBC Driver `PARTITION` connection parameter.
 `password`              |             | string         | <a id="cp_password"></a>              Specifies the database password. Equivalent to the Teradata JDBC Driver `PASSWORD` connection parameter.
 `proxy_bypass_hosts`    |             | string         | <a id="cp_proxy_bypass_hosts"></a>    Specifies a matching pattern for hostnames and addresses to bypass the proxy server identified by the `http_proxy` and/or `https_proxy` parameter. This parameter may only be specified in conjunction with the `http_proxy` and/or `https_proxy` parameter. Separate multiple hostnames and addresses with a vertical bar `\|` character. Specify an asterisk `*` as a wildcard character. When this parameter is omitted, the default pattern `localhost\|127.*\|[::1]` bypasses the proxy server identified by the `http_proxy` and/or `https_proxy` parameter for common variations of the loopback address. Equivalent to the Teradata JDBC Driver `PROXY_BYPASS_HOSTS` connection parameter.
+`reconnect_count`       |             | quoted integer | <a id="cp_reconnect_count"></a>       Enables [Session Reconnect](#SessionReconnect) and specifies the maximum number of times that the driver will attempt to reconnect the session. When `reconnect_count` is omitted, but Session Reconnect is otherwise enabled, the default is 11 attempts. Equivalent to the Teradata JDBC Driver `RECONNECT_COUNT` connection parameter.
+`reconnect_interval`    |             | quoted integer | <a id="cp_reconnect_interval"></a>    Enables [Session Reconnect](#SessionReconnect) and specifies the number of seconds that the driver will wait between attempts to reconnect the session. When `reconnect_interval` is omitted, but Session Reconnect is otherwise enabled, the default is 30 seconds. Equivalent to the Teradata JDBC Driver `RECONNECT_INTERVAL` connection parameter.
+`redrive`               | `"3"`       | quoted integer | <a id="cp_redrive"></a>               Enables [Session Reconnect](#SessionReconnect) and enables automatic redriving of SQL requests interrupted by database restart.<br/>&bull; `0` disables the use of Control Data, disables Recoverable Network Protocol (RNP), and disables automatic Redrive of SQL requests.<br/>&bull; `1` solicits the use of Control Data, but disables RNP, and disables automatic Redrive of SQL requests.<br/>&bull; `2` solicits the use of Control Data, solicits RNP, but disables automatic Redrive of SQL requests.<br/>&bull; `3` (the default) solicits the use of Control Data, solicits RNP, and specifies no preference with respect to automatic Redrive of SQL requests.<br/>&bull; `4` solicits the use of Control Data, solicits RNP, and solicits automatic Redrive of SQL requests.<br/>The application is not guaranteed to receive the functionality that it solicits with the `redrive` connection parameter. The database determines whether the functionality is provided or not, depending on the database `dbscontrol` fields RedriveProtection&nbsp;(67), RedriveDefaultParticipation&nbsp;(68), and DisableRecoverableNetProtocol&nbsp;(77). Equivalent to the Teradata JDBC Driver `REDRIVE` connection parameter.
 `request_timeout`       | `"0"`       | quoted integer | <a id="cp_request_timeout"></a>       Specifies the timeout in seconds for executing each SQL request. Zero means no timeout.
 `runstartup`            | `"false"`   | quoted boolean | <a id="cp_runstartup"></a>            Controls whether the user's `STARTUP` SQL request is executed after logon. For more information, refer to [User STARTUP SQL Request](#UserStartup). Equivalent to the Teradata JDBC Driver `RUNSTARTUP` connection parameter.
 `sessions`              |             | quoted integer | <a id="cp_sessions"></a>              Specifies the number of data transfer connections for FastLoad or FastExport. The default (recommended) lets the database choose the appropriate number of connections. Equivalent to the Teradata JDBC Driver `SESSIONS` connection parameter.
@@ -281,7 +615,7 @@ Parameter               | Default     | Type           | Description
 `sslnamedgroups`        |             | string         | <a id="cp_sslnamedgroups"></a>        Specifies the TLS key exchange named groups for HTTPS/TLS connections. Multiple named groups are separated by commas. Default lets database and driver choose the most appropriate named group. Omitting this parameter is recommended. Use this parameter only for troubleshooting TLS handshake issues. Equivalent to the Teradata JDBC Driver `SSLNAMEDGROUPS` connection parameter.
 `sslocsp`               | `"true"`    | quoted boolean | <a id="cp_sslocsp"></a>               Controls the use of Online Certificate Status Protocol (OCSP) for TLS certificate revocation checking for HTTPS/TLS connections. Equivalent to the Teradata JDBC Driver `SSLOCSP` connection parameter.
 `sslprotocol`           | `"TLSv1.2"` | string         | <a id="cp_sslprotocol"></a>           Specifies the TLS protocol for HTTPS/TLS connections. Omitting this parameter is recommended. Use this parameter only for troubleshooting TLS handshake issues. Equivalent to the Teradata JDBC Driver `SSLPROTOCOL` connection parameter.
-`teradata_values`       | `"true"`    | quoted boolean | <a id="cp_teradata_values"></a>       Controls whether `str` or a more specific JavaScript data type is used for certain result set column value types. Refer to the [Data Types](#DataTypes) table below for details.
+`teradata_values`       | `"true"`    | quoted boolean | <a id="cp_teradata_values"></a>       Controls whether `String` or a more specific JavaScript data type is used for certain result set column value types. Refer to the [Data Types](#DataTypes) table below for details.
 `tmode`                 | `"DEFAULT"` | string         | <a id="cp_tmode"></a>                 Specifies the [transaction mode](#TransactionMode). Equivalent to the Teradata JDBC Driver `TMODE` connection parameter. Possible values are `DEFAULT` (the default), `ANSI`, or `TERA`.
 `user`                  |             | string         | <a id="cp_user"></a>                  Specifies the database username. Equivalent to the Teradata JDBC Driver `USER` connection parameter.
 
@@ -970,6 +1304,20 @@ When a combination of parameters are specified, connection parameters specified 
 
 ---
 
+`new teradatasql.TeradataConnection()`
+
+Creates a new TeradataConnection object without establishing a connection to the database. Use the `.connectAsync()` or `.connect()` method to establish the connection.
+
+**Usage with async connection:**
+```javascript
+const con = new teradatasql.TeradataConnection();
+await con.connectAsync({host:"whomooz", user:"guest", password:"please"});
+```
+
+For more information, see the [Async Connection Management](#AsyncConnectionManagement) section.
+
+---
+
 `teradatasql.date(` *Year* `,` *Month* `,` *Day* `)`
 
 Creates and returns a `string` value in the ‘YYYY-MM-DD’ format.
@@ -999,12 +1347,12 @@ Creates and returns a `Date` value corresponding to the specified number of seco
 ### Module Exceptions
 
 `teradatasql.Error` is the base class for other exceptions.
-* `teradatasql.InterfaceError` is raised for errors related to the driver. Not supported yet.
+* `teradatasql.InterfaceError` is raised for errors related to the driver.
 * `teradatasql.DatabaseError` is raised for errors related to the database.
-  * `teradatasql.DataError` is raised for data value errors such as division by zero. Not supported yet.
-  * `teradatasql.IntegrityError` is raised for referential integrity violations. Not supported yet.
-  * `teradatasql.OperationalError` is raised for errors related to the database's operation.
-  * `teradatasql.ProgrammingError` is raised for SQL object existence errors and SQL syntax errors. Not supported yet.
+  * `teradatasql.DataError` is raised for data value errors such as division by zero.
+  * `teradatasql.IntegrityError` is raised for referential integrity violations.
+  * `teradatasql.OperationalError` is raised for errors related to the database's operation, such as connection failures, timeouts, or communication errors.
+  * `teradatasql.ProgrammingError` is raised for programming errors, such as incorrect API usage, invalid operation sequencing (e.g., Error 801, 802, 803, 804), or attempts to perform operations on closed objects.
 
 <a id="ConnectionAttributes"></a>
 
@@ -1032,9 +1380,44 @@ Closes the Connection.
 
 ---
 
+`.closeAsync()`
+
+Asynchronously closes the Connection and returns a `Promise<void>` that resolves when the connection closure is complete.
+
+This method provides non-blocking connection closure, allowing other operations to proceed while the connection is being closed. The operation includes client-side timeout protection (30 seconds) and polls for completion at 100ms intervals.
+
+**Usage:**
+```javascript
+await con.closeAsync();
+```
+
+See [Async Connection Management](#AsyncConnectionManagement) for usage details and concurrency limitations.
+
+---
+
 `.commit()`
 
 Commits the current transaction.
+
+---
+
+`.connectAsync(` *ConnectionObject* `, ` *ConnectionJSONString* `)`
+
+Asynchronously establishes a connection to the database and returns a `Promise<void>` that resolves when the connection is established.
+
+This method provides non-blocking connection establishment, allowing other operations to proceed while the connection is being established. The operation includes client-side timeout protection (5 minutes when `logon_timeout` is not specified or `"0"`, otherwise `logon_timeout` + 5 second buffer) and polls for completion at 100ms intervals.
+
+The first parameter is an optional JavaScript object that defaults to `{}`. The second argument is an optional JSON string that defaults to `"{}"`. Specify connection parameters as a JavaScript object, a JSON string, or a combination of the two.
+
+When a combination of parameters are specified, connection parameters specified as the JSON string takes precedence over same-named connection parameters specified in the JavaScript object.
+
+**Usage:**
+```javascript
+const con = new teradatasql.TeradataConnection();
+await con.connectAsync({host:"whomooz", user:"guest", password:"please"});
+```
+
+See [Async Connection Management](#AsyncConnectionManagement) for usage details and concurrency limitations.
 
 ---
 
@@ -1101,7 +1484,7 @@ Read-only `BigInt` attribute indicating the number of rows returned from, or aff
 
 Read-only `boolean` attribute indicating whether the cursor is currently executing an asynchronous SQL request via `.executeAsync()` or `.executemanyAsync()`.
 
-**Important Usage Note:** This attribute reflects the current state of the cursor at the time it's read. However, checking this attribute does not guarantee that subsequent operations will succeed, because another cursor on the same connection might be executing an async operation.
+**Note:** This attribute reflects the cursor's state at the time it's read. Another cursor on the same connection may also be executing an async operation. See [Concurrency Behavior and Limitations](#concurrency-behavior-and-limitations) for details.
 
 ---
 
@@ -1138,9 +1521,9 @@ If a sequence of parameter values is provided as the second argument, the values
 Asynchronously executes the SQL request and returns a `Promise<void>` that resolves when the SQL request execution is complete.
 If a sequence of parameter values is provided as the second argument, the values will be bound to question-mark parameter markers in the SQL request. Specifying parameter values as a mapping is not supported.
 
-The asynchronous execution allows other operations to proceed while the SQL request is being processed by the database. During execution, the cursor's `.isAsyncExec` property will return `true`.
-
 The `ignoreErrors` parameter is optional. The ignored error codes must be specified as a sequence of integers.
+
+See [Async Connection Management](#AsyncConnectionManagement) for usage details and concurrency limitations.
 
 ---
 
@@ -1158,43 +1541,11 @@ The `ignoreErrors` parameter is optional. The ignored error codes must be specif
 Asynchronously executes the SQL request as an iterated SQL request for the batch of parameter values and returns a `Promise<void>` that resolves when the batch SQL request execution is complete.
 The batch of parameter values must be specified as a sequence of sequences. Specifying parameter values as a mapping is not supported.
 
-The asynchronous execution allows other operations to proceed while the SQL requests are being processed by the database. During execution, the cursor's `.isAsyncExec` property will return `true`.
-
 The `ignoreErrors` parameter is optional. The ignored error codes must be specified as a sequence of integers.
 
-#### Async Execution Error Codes
+See [Async Connection Management](#AsyncConnectionManagement) for usage details and concurrency limitations.
 
-You may encounter specific error codes related to concurrent SQL execution when using **any cursor methods** (`.execute()`, `.executemany()`, `.executeAsync()`, `.executemanyAsync()`, `.close()`, etc.) if an asynchronous operation is already in progress on the same cursor or connection:
-
-* **Error 701**: "A SQL request is still executing. Please submit the new request later."
-  - Occurs when attempting to execute a new SQL request while another request is still in progress on the same cursor
-  - Can happen with `.execute()`, `.executemany()`, `.executeAsync()`, or `.executemanyAsync()` if the cursor is already executing an async operation
-  - Check the `.isAsyncExec` property before submitting new requests
-  - Thrown by the cursor's internal `_stopIfInAsyncExecute()` method
-
-* **Error 703**: "A SQL request is still executing. Please close the cursor later."
-  - Occurs when attempting to close a cursor while a SQL request is still executing on the same cursor
-  - Can happen with `.close()` if the cursor is executing an async operation
-  - Wait for the current async operation to complete before closing the cursor
-  - Thrown by the cursor's `close()` method
-
-* **Error 751**: "A SQL request is still executing. Please submit the new request later."
-  - Occurs when attempting to execute a new SQL request while another request is still in progress
-  - Can happen with any execution method if another cursor on the same connection is executing an async operation
-  - Check the `.isAsyncExec` property of all cursors before submitting new requests
-  - Thrown by the Teradata GoSQL Driver
-
-* **Error 752**: "A SQL request is still executing. Please close the connection later."
-  - Occurs when attempting to close a connection while a SQL request is still executing
-  - Can happen with `.close()` if any cursor on the connection is executing an async operation
-  - Wait for all async operations to complete before closing the connection
-  - Thrown by the Teradata GoSQL Driver
-
-* **Error 753**: "A SQL request is still executing. Please close rows later."
-  - Occurs when attempting to close result rows while a SQL request is still executing
-  - Can happen with cursor operations that close rows if an async operation is in progress
-  - Wait for the current async operation to complete before closing rows
-  - Thrown by the Teradata GoSQL Driver
+**Note:** If an asynchronous operation is in progress, attempting to perform other operations may result in specific error codes (801-804 TypeScript layer, 750-752 and 760-765 Go layer). See [Error Handling](#error-handling) in the Async Connection Management section for complete error code reference.
 
 ---
 
@@ -1778,6 +2129,10 @@ SQL requests can be executed after a database connection is established.
 <a id="ChangeLog"></a>
 
 ### Change Log
+
+`20.0.51` - Febuary 12, 2026
+* GOSQL-317 Update README.md for connection parameters reconnect_count, reconnect_interval, redrive
+* NJSD-39 Provide asynchronous connect and close connection
 
 `20.0.50` - January 16, 2026
 * GOSQL-312 escape functions teradata_array_transform_off/on and teradata_udt_transforms_off/on
