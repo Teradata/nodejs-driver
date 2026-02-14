@@ -2130,6 +2130,9 @@ SQL requests can be executed after a database connection is established.
 
 ### Change Log
 
+`20.0.52` - Febuary 12, 2026
+* GOSQL-318 Switch to Go 1.26.0
+
 `20.0.51` - Febuary 12, 2026
 * GOSQL-317 Update README.md for connection parameters reconnect_count, reconnect_interval, redrive
 * NJSD-39 Provide asynchronous connect and close connection
