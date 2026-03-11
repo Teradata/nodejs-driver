@@ -2130,6 +2130,9 @@ SQL requests can be executed after a database connection is established.
 
 ### Change Log
 
+`20.0.53` - March 10, 2026
+* GOSQL-327 Switch to Go 1.26.1
+
 `20.0.52` - Febuary 12, 2026
 * GOSQL-318 Switch to Go 1.26.0
 
