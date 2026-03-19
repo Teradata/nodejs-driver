@@ -1834,6 +1834,7 @@ Connection Function                           | Returns
 `{fn teradata_get_errors}`                    | Errors from the most recent batch operation
 `{fn teradata_get_warnings}`                  | Warnings from an operation that completed with warnings
 `{fn teradata_getloglevel}`                   | Current log level
+`{fn teradata_go_distribution}`               | Go distribution `M` ([Microsoft Go](https://github.com/microsoft/go)) or `S` ([standard Go](https://go.dev/dl/)) for the Teradata GoSQL Driver
 `{fn teradata_go_runtime}`                    | Go runtime version for the Teradata GoSQL Driver
 `{fn teradata_logon_sequence_number}`         | Session's Logon Sequence Number, if available
 `{fn teradata_program_name}`                  | Executable program name
@@ -2129,6 +2130,9 @@ SQL requests can be executed after a database connection is established.
 <a id="ChangeLog"></a>
 
 ### Change Log
+
+`20.0.54` - March 19, 2026
+* GOSQL-340 escape function teradata_go_distribution
 
 `20.0.53` - March 10, 2026
 * GOSQL-327 Switch to Go 1.26.1
