@@ -31,7 +31,7 @@ try {
             for (let iRow: number = 0; iRow < rows.length; iRow++) {
                 const row: Row = rows[iRow];
 
-                for (let iColumn: number = 0; row != null && iColumn < row.length; iColumn++) {
+                for (let iColumn: number = 0; row != null && cur.description != null && iColumn < row.length; iColumn++) {
                     let oValue: any = row[iColumn];
                     let sType: string = typeof oValue;
 
