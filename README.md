@@ -2479,6 +2479,10 @@ SQL requests can be executed after a database connection is established.
 
 ### Change Log
 
+`20.0.72` - October 12, 2026
+* GOSQL-476 Switch to Go 1.27.2
+* Switch to golang.org/x/crypto v0.58.0
+
 `20.0.71` - October 9, 2026
 * GOSQL-144 type=fastload/fastexport connection parameter
 * GOSQL-474 Client Attribute ClientSecProdUserId for database and identity provider TLS named group
