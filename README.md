@@ -2479,6 +2479,9 @@ SQL requests can be executed after a database connection is established.
 
 ### Change Log
 
+`20.0.73` - October 28, 2026
+* GOSQL-485 Switch to Go 1.27.3
+
 `20.0.72` - October 12, 2026
 * GOSQL-476 Switch to Go 1.27.2
 * Switch to golang.org/x/crypto v0.58.0
